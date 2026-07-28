@@ -1,0 +1,46 @@
+# Flutter
+smartfleet_mobile/.dart_tool/
+smartfleet_mobile/build/
+smartfleet_mobile/.packages
+smartfleet_mobile/.pub/
+smartfleet_mobile/.flutter-plugins
+smartfleet_mobile/.flutter-plugins-dependencies
+
+# Android
+smartfleet_mobile/android/.gradle/
+smartfleet_mobile/android/local.properties
+smartfleet_mobile/android/app/build/
+*.apk
+*.aab
+
+# iOS
+smartfleet_mobile/ios/Pods/
+smartfleet_mobile/ios/.symlinks/
+smartfleet_mobile/ios/Flutter/Flutter.framework
+smartfleet_mobile/ios/Flutter/Flutter.podspec
+smartfleet_mobile/ios/Flutter/ephemeral/
+*.xcworkspace
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+
+# Java / Maven
+backend/target/
+*.class
+*.jar
+*.war
+
+# Env
+.env
+.env.local

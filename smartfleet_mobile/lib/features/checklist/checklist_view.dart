@@ -13,6 +13,7 @@ import '../../services/qr_code_service.dart';
 import '../../services/decision/moteur_decision_service.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/signature_pad.dart';
+import '../../widgets/barcode_scanner_dialog.dart';
 
 class ChecklistView extends StatefulWidget {
   const ChecklistView({super.key});
@@ -257,6 +258,11 @@ class _ChecklistViewState extends State<ChecklistView> {
       appBar: AppBar(
         title: Text('Check-up $_currentImmat'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            tooltip: 'Scanner un code-barres',
+            onPressed: _openBarcodeScanner,
+          ),
           TextButton(
             onPressed: _completeSession,
             child: const Text('Terminer', style: TextStyle(color: Colors.white)),
@@ -627,6 +633,24 @@ class _ChecklistViewState extends State<ChecklistView> {
         );
       }
     });
+  }
+
+  Future<void> _openBarcodeScanner() async {
+    final code = await BarcodeScannerDialog.show(context);
+    if (code != null && mounted) {
+      final firstItem = _itemValues.keys.firstOrNull;
+      if (firstItem != null) {
+        final existing = _commentCtrls[firstItem]?.text ?? '';
+        _commentCtrls[firstItem]?.text = existing.isEmpty ? code : '$existing\n[Code-barres] $code';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Code ajouté à "${_getItemName(firstItem)}"'),
+            backgroundColor: AppTheme.success,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 }
 

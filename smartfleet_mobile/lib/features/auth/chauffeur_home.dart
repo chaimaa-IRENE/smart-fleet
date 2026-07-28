@@ -10,6 +10,7 @@ import '../../services/vehicle_service.dart';
 import '../../widgets/danone_app_bar.dart';
 import '../../widgets/premium/glass_card.dart';
 import '../../widgets/premium/premium_kpi_card.dart';
+import '../../widgets/barcode_scanner_dialog.dart';
 import '../../services/sync_service.dart';
 
 class ChauffeurHome extends StatefulWidget {
@@ -28,6 +29,10 @@ class _ChauffeurHomeState extends State<ChauffeurHome> {
   void initState() {
     super.initState();
     _loadStats();
+  }
+
+  Future<void> _openBarcodeTest() async {
+    await BarcodeScannerDialog.show(context);
   }
 
   Future<void> _loadStats() async {
@@ -201,8 +206,12 @@ class _ChauffeurHomeState extends State<ChauffeurHome> {
                 onTap: () => context.go('/chauffeur/documents'),
               )),
               const SizedBox(width: 12),
-              // empty placeholder to keep 2-column grid
-              const Expanded(child: SizedBox.shrink()),
+              Expanded(child: _ActionTile(
+                icon: Icons.qr_code_scanner,
+                label: 'Code-barres',
+                color: Colors.deepPurple,
+                onTap: _openBarcodeTest,
+              )),
             ],
           ),
           const SizedBox(height: 24),

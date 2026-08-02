@@ -27,6 +27,7 @@ class _PrestataireInterventionFormState
   final _coutCtrl = TextEditingController();
   String? _contratBonCommande;
   String? _etatReparation;
+  String _devise = 'EUR';
   bool _submitting = false;
 
   @override
@@ -81,6 +82,7 @@ class _PrestataireInterventionFormState
           dureeReparation: dureeReparation,
           etatReparation: _etatReparation,
           dateReparation: DateTime.now().toIso8601String(),
+          devise: _devise,
         );
 
     setState(() => _submitting = false);
@@ -89,7 +91,8 @@ class _PrestataireInterventionFormState
       if (ok) {
         Navigator.pop(context, true);
       } else {
-        _showError('Erreur lors de la soumission');
+        final errMsg = context.read<DeclarationProvider>().error ?? 'Erreur lors de la soumission';
+        _showError(errMsg);
       }
     }
   }
@@ -200,23 +203,39 @@ class _PrestataireInterventionFormState
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            TextFormField(
-              controller: _coutCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Coût réel *',
-                hintText: 'Montant en euros',
-                border: OutlineInputBorder(),
-                suffixText: '€',
-              ),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Champ requis';
-                final val = double.tryParse(v.trim());
-                if (val == null || val <= 0) return 'Montant invalide';
-                return null;
-              },
-            ),
+            Row(children: [
+              Expanded(flex: 3, child: TextFormField(
+                controller: _coutCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Coût réel *',
+                  hintText: 'Montant',
+                  border: const OutlineInputBorder(),
+                  suffixText: AppConstants.deviseLabels[_devise] ?? _devise,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'Champ requis';
+                  final val = double.tryParse(v.trim());
+                  if (val == null || val <= 0) return 'Montant invalide';
+                  return null;
+                },
+              )),
+              const SizedBox(width: 8),
+              Expanded(flex: 2, child: DropdownButtonFormField<String>(
+                value: _devise,
+                decoration: const InputDecoration(
+                  labelText: 'Devise',
+                  border: OutlineInputBorder(),
+                ),
+                items: AppConstants.deviseOptions
+                    .map((d) => DropdownMenuItem(
+                          value: d,
+                          child: Text(AppConstants.deviseLabels[d] ?? d),
+                        ))
+                    .toList(),
+                onChanged: (v) => setState(() { if (v != null) _devise = v; }),
+              )),
+            ]),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _etatReparation,

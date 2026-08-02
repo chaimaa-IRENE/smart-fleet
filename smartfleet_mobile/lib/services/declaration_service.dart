@@ -72,30 +72,30 @@ class DeclarationService {
 
   Future<int> takeCharge(
       int id, int prestataireId, String prestataireNom,) async {
-    return await _dao.update(id, {
-      'statut': 'PRISE_EN_CHARGE',
+    final result = await _dao.update(id, {
+      'statut': 'EN_COURS',
       'prestataireId': prestataireId,
       'prestataireNom': prestataireNom,
+      'dateDebutIntervention': DateTime.now().toIso8601String(),
     });
-  }
-
-  Future<int> markAsInProgress(int id) async {
-    return await _dao.updateStatus(id, 'EN_COURS');
-  }
-
-  Future<int> markAsValidated(int id) async {
-    return await _dao.updateStatus(id, 'EN_VALIDATION');
-  }
-
-  Future<int> markAsProcessed(int id, {double? coutReel}) async {
-    final result = await _dao.updateStatus(id, 'TRAITE', coutReel: coutReel);
-    await _syncDao.addToQueue('declarations', 'STATUS_UPDATE', id,
-        payload: {'statut': 'TRAITE', 'coutReel': coutReel},);
+    await _syncDao.addToQueue('declarations', 'TAKE_CHARGE', id,
+        payload: {'prestataireId': prestataireId, 'prestataireNom': prestataireNom},);
     return result;
   }
 
-  Future<int> startWork(int id) async {
-    return await _dao.updateStatus(id, 'EN_COURS');
+  Future<int> markAsValidated(int id) async {
+    final result = await _dao.updateStatus(id, 'EN_VALIDATION');
+    await _syncDao.addToQueue('declarations', 'STATUS_UPDATE', id,
+        payload: {'statut': 'EN_VALIDATION'},);
+    return result;
+  }
+
+  Future<int> markAsProcessed(int id, {double? coutReel}) async {
+    final result = await _dao.updateStatus(id, 'TRAITE',
+        dateCloture: DateTime.now().toIso8601String(), coutReel: coutReel);
+    await _syncDao.addToQueue('declarations', 'STATUS_UPDATE', id,
+        payload: {'statut': 'TRAITE', 'coutReel': coutReel},);
+    return result;
   }
 
   Future<int> submitForValidation(
@@ -108,24 +108,38 @@ class DeclarationService {
     int? dureeReparation,
     String? etatReparation,
     String? dateReparation,
+    String? devise,
   }) async {
-    return await _dao.update(id, {
-      'statut': 'EN_VALIDATION',
-      if (solution != null) 'solution': solution,
-      if (actionsRealisees != null) 'actionsRealisees': actionsRealisees,
-      if (piecesNecessaires != null) 'piecesNecessaires': piecesNecessaires,
-      if (contratBonCommande != null) 'contratBonCommande': contratBonCommande,
-      if (coutReel != null) 'coutReel': coutReel,
-      if (dureeReparation != null) 'dureeReparation': dureeReparation,
-      if (etatReparation != null) 'etat': etatReparation,
-      if (dateReparation != null) 'dateReparation': dateReparation,
-    });
+    try {
+      final data = <String, dynamic>{
+        'statut': 'EN_VALIDATION',
+        if (solution != null) 'solution': solution,
+        if (actionsRealisees != null) 'actionsRealisees': actionsRealisees,
+        if (piecesNecessaires != null) 'piecesNecessaires': piecesNecessaires,
+        if (contratBonCommande != null) 'contratBonCommande': contratBonCommande,
+        if (coutReel != null) 'coutReel': coutReel,
+        if (dureeReparation != null) 'dureeReparation': dureeReparation,
+        if (etatReparation != null) 'etat': etatReparation,
+        if (dateReparation != null) 'dateReparation': dateReparation,
+        if (devise != null) 'devise': devise,
+      };
+      final result = await _dao.update(id, data);
+      final payload = <String, dynamic>{'statut': 'EN_VALIDATION'};
+      if (coutReel != null) payload['coutReel'] = coutReel;
+      if (devise != null) payload['devise'] = devise;
+      await _syncDao.addToQueue('declarations', 'STATUS_UPDATE', id, payload: payload);
+      return result;
+    } catch (e) {
+      throw Exception('submitForValidation(id=$id): $e');
+    }
   }
 
   Future<int> markProcessed(int id, {double? coutReel}) async {
-    final data = <String, dynamic>{'statut': 'TRAITE'};
+    final data = <String, dynamic>{'statut': 'TRAITE', 'dateCloture': DateTime.now().toIso8601String()};
     if (coutReel != null) data['coutReel'] = coutReel;
-    return await _dao.update(id, data);
+    final result = await _dao.update(id, data);
+    await _syncDao.addToQueue('declarations', 'STATUS_UPDATE', id, payload: data);
+    return result;
   }
 
   Future<int> returnDeclaration(int id, String motif) async {

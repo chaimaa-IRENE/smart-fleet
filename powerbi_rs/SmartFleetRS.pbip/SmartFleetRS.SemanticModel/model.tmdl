@@ -1,0 +1,1010 @@
+model SmartFleetRS {
+  culture: 'fr-FR';
+  compatibilityLevel: 1600;
+  annotation PBIDesktopVersion = "5.69.8424.3601";
+
+  // =====================================================================
+  // DECLARATIONS — declaration_incident.csv (47 colonnes, noms exacts CSV)
+  // =====================================================================
+  table Declarations {
+    annotation IsHiddenInReport = false;
+
+    column ID_INCIDENT { dataType: int64; sourceColumn: "ID_INCIDENT"; }
+    column ACTIONS_REALISEES { dataType: string; sourceColumn: "ACTIONS_REALISEES"; }
+    column AUDIO { dataType: string; sourceColumn: "AUDIO"; }
+    column BUDGET_MENSUEL { dataType: double; sourceColumn: "BUDGET_MENSUEL"; }
+    column CATEGORIE { dataType: string; sourceColumn: "CATEGORIE"; }
+    column CHAUFFEUR_ID { dataType: int64; sourceColumn: "CHAUFFEUR_ID"; }
+    column CHAUFFEUR_MATRICULE { dataType: string; sourceColumn: "CHAUFFEUR_MATRICULE"; }
+    column CHAUFFEUR_NOM { dataType: string; sourceColumn: "CHAUFFEUR_NOM"; }
+    column CONTRAT_BON_COMMANDE { dataType: string; sourceColumn: "CONTRAT_BON_COMMANDE"; }
+    column COUT_PROBLEME { dataType: double; sourceColumn: "COUT_PROBLEME"; }
+    column CRITICITE { dataType: string; sourceColumn: "CRITICITE"; }
+    column DATE_DEBUT_INTERVENTION { dataType: dateTime; sourceColumn: "DATE_DEBUT_INTERVENTION"; }
+    column DATE_HEURE { dataType: dateTime; sourceColumn: "DATE_HEURE"; }
+    column DATE_RECLAMATION { dataType: dateTime; sourceColumn: "DATE_RECLAMATION"; }
+    column DATE_REPARATION { dataType: dateTime; sourceColumn: "DATE_REPARATION"; }
+    column DESCRIPTION_ARABE { dataType: string; sourceColumn: "DESCRIPTION_ARABE"; }
+    column DESCRIPTION_FRANCAIS { dataType: string; sourceColumn: "DESCRIPTION_FRANCAIS"; }
+    column DETAIL_ELEMENT { dataType: string; sourceColumn: "DETAIL_ELEMENT"; }
+    column DUREE_REPARATION { dataType: double; sourceColumn: "DUREE_REPARATION"; }
+    column ELEMENT_VEHICULE { dataType: string; sourceColumn: "ELEMENT_VEHICULE"; }
+    column ETAT { dataType: string; sourceColumn: "ETAT"; }
+    column KILOMETRAGE { dataType: double; sourceColumn: "KILOMETRAGE"; }
+    column LIEU { dataType: string; sourceColumn: "LIEU"; }
+    column LIEU_INCIDENT_ARABE { dataType: string; sourceColumn: "LIEU_INCIDENT_ARABE"; }
+    column LIEU_INCIDENT_FRANCAIS { dataType: string; sourceColumn: "LIEU_INCIDENT_FRANCAIS"; }
+    column LOCATION { dataType: string; sourceColumn: "LOCATION"; }
+    column MOIS { dataType: string; sourceColumn: "MOIS"; }
+    column MOTIF_REFUS { dataType: string; sourceColumn: "MOTIF_REFUS"; }
+    column NUMERO_DEMANDE { dataType: string; sourceColumn: "NUMERO_DEMANDE"; }
+    column NUMERO_ORDRE_CAMION { dataType: string; sourceColumn: "NUMERO_ORDRE_CAMION"; }
+    column PHOTO { dataType: string; sourceColumn: "PHOTO"; }
+    column PHOTO_URL { dataType: string; sourceColumn: "PHOTO_URL"; }
+    column PIECES_NECESSAIRES { dataType: string; sourceColumn: "PIECES_NECESSAIRES"; }
+    column QUALIFICATION { dataType: string; sourceColumn: "QUALIFICATION"; }
+    column SLA { dataType: string; sourceColumn: "SLA"; }
+    column SOURCE { dataType: string; sourceColumn: "SOURCE"; }
+    column STATUT { dataType: string; sourceColumn: "STATUT"; }
+    column TOURNEE { dataType: string; sourceColumn: "TOURNEE"; }
+    column TYPE_PANNE { dataType: string; sourceColumn: "TYPE_PANNE"; }
+    column TYPE_PANNE_ARABE { dataType: string; sourceColumn: "TYPE_PANNE_ARABE"; }
+    column TYPE_PANNE_FRANCAIS { dataType: string; sourceColumn: "TYPE_PANNE_FRANCAIS"; }
+    column VEHICULE_ID { dataType: int64; sourceColumn: "VEHICULE_ID"; }
+    column VEHICULE_IMMATRICULATION { dataType: string; sourceColumn: "VEHICULE_IMMATRICULATION"; }
+    column VEHICULE_MARQUE { dataType: string; sourceColumn: "VEHICULE_MARQUE"; }
+    column VEHICULE_MODELE { dataType: string; sourceColumn: "VEHICULE_MODELE"; }
+    column VEHICULE_TYPE { dataType: string; sourceColumn: "VEHICULE_TYPE"; }
+    column VIDEO { dataType: string; sourceColumn: "VIDEO"; }
+    column VIDEO_URL { dataType: string; sourceColumn: "VIDEO_URL"; }
+
+    // ---- Colonnes calculées (logique web exacte : DECL_STATUT_LABELS) ----
+    column STATUT_LABEL {
+      dataType: string;
+      expression: SWITCH(
+        [STATUT], "EN_ATTENTE", "En attente", "EN_COURS", "En cours",
+        "EN_VALIDATION", "En validation", "CLOTURE", "Cloture",
+        "RETOURNEE", "Retourne", "REFUSE", "Refuse", [STATUT]
+      );
+    }
+
+    // Filtre web "Type panne" : compare categorie OU typePanne
+    column TYPE_PANNE_FILTRE {
+      dataType: string;
+      expression: COALESCE([CATEGORIE], [TYPE_PANNE]);
+    }
+
+    column TYPE_PANNE_FILTRE_LABEL {
+      dataType: string;
+      expression: SWITCH(
+        [TYPE_PANNE_FILTRE], "MECANIQUE", "Mecanique", "ELECTRIQUE", "Electrique",
+        "CAISSE", "Caisse", "CABINE", "Cabine", "SECURITE", "Securite",
+        "AUTRES", "Autres", [TYPE_PANNE_FILTRE]
+      );
+    }
+
+    column DUREE_REPARATION_LABEL {
+      dataType: string;
+      expression:
+        VAR t = INT([DUREE_REPARATION] / 60)
+        VAR h = INT(t / 60)
+        VAR m = MOD(t, 60)
+        RETURN IF(ISBLANK([DUREE_REPARATION]), BLANK(), IF(h > 0, FORMAT(h, "0") & "h " & FORMAT(m, "0") & "m", FORMAT(m, "0") & "m"));
+    }
+
+    // Tranches web du pie : En attente / En cours / En validation / Cloturees / Retournees.
+    // Les statuts hors liste (REFUSE, OUVERTE, RESOLU...) sont exclus du pie comme dans le web
+    // (declStats web ne compte que ces 5 statuts fixes).
+    column PIE_SEGMENT {
+      dataType: string;
+      expression: SWITCH([STATUT],
+        "EN_ATTENTE", "En attente",
+        "EN_COURS", "En cours",
+        "EN_VALIDATION", "En validation",
+        "CLOTURE", "Cloturees",
+        "RETOURNEE", "Retournees",
+        BLANK());
+    }
+
+    // Période (filtre web Power BI : 7 jours / 30 jours / 90 jours / 1 an)
+    column PERIODE {
+      dataType: string;
+      expression: SWITCH(TRUE(),
+        [DATE_HEURE] >= DATEVALUE(TODAY()) - 6, "7 jours",
+        [DATE_HEURE] >= DATEVALUE(TODAY()) - 29, "30 jours",
+        [DATE_HEURE] >= DATEVALUE(TODAY()) - 89, "90 jours",
+        [DATE_HEURE] >= DATEVALUE(TODAY()) - 364, "1 an",
+        "Plus d'un an");
+    }
+
+    // Filtres web Power BI "Toutes annees" / "Tous mois" (sur dateDeclaration = DATE_HEURE)
+    column ANNEE_DECLARATION {
+      dataType: int64;
+      expression: YEAR([DATE_HEURE]);
+    }
+
+    column MOIS_DECLARATION {
+      dataType: string;
+      expression: FORMAT([DATE_HEURE], "MM");
+    }
+
+    // Filtres web Power BI "Toutes regions" / "Aucun prestataire" :
+    // listes vides dans le web (regions hardcodee [], interventions sans donnees) => colonnes vides
+    column REGION {
+      dataType: string;
+      expression: BLANK();
+    }
+
+    column PRESTATAIRE {
+      dataType: string;
+      expression: BLANK();
+    }
+
+    measure 'Nb Declarations' = COUNTROWS('Declarations')
+      formatString: "#,##0";
+
+    measure 'En attente' = CALCULATE(COUNTROWS('Declarations'), 'Declarations'[STATUT] = "EN_ATTENTE")
+      formatString: "#,##0";
+
+    measure 'En cours' = CALCULATE(COUNTROWS('Declarations'), 'Declarations'[STATUT] = "EN_COURS")
+      formatString: "#,##0";
+
+    measure 'En validation' = CALCULATE(COUNTROWS('Declarations'), 'Declarations'[STATUT] = "EN_VALIDATION")
+      formatString: "#,##0";
+
+    measure 'Cloturees' = CALCULATE(COUNTROWS('Declarations'), 'Declarations'[STATUT] = "CLOTURE")
+      formatString: "#,##0";
+
+    measure 'Retournees' = CALCULATE(COUNTROWS('Declarations'), 'Declarations'[STATUT] = "RETOURNEE")
+      formatString: "#,##0";
+
+    measure 'Refusees' = CALCULATE(COUNTROWS('Declarations'), 'Declarations'[STATUT] = "REFUSE")
+      formatString: "#,##0";
+
+    measure 'Cout total declarations' = SUM('Declarations'[COUT_PROBLEME])
+      formatString: "#,##0.00";
+
+    measure 'Declarations a traiter (EN_VALIDATION)' = [En validation]
+      formatString: "#,##0";
+
+    partition 'declarations' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/declaration_incident.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID_INCIDENT", Int64.Type}, {"ACTIONS_REALISEES", type text}, {"AUDIO", type text},
+            {"BUDGET_MENSUEL", type number}, {"CATEGORIE", type text}, {"CHAUFFEUR_ID", Int64.Type},
+            {"CHAUFFEUR_MATRICULE", type text}, {"CHAUFFEUR_NOM", type text},
+            {"CONTRAT_BON_COMMANDE", type text}, {"COUT_PROBLEME", type number}, {"CRITICITE", type text},
+            {"DATE_DEBUT_INTERVENTION", type datetime}, {"DATE_HEURE", type datetime},
+            {"DATE_RECLAMATION", type datetime}, {"DATE_REPARATION", type datetime},
+            {"DESCRIPTION_ARABE", type text}, {"DESCRIPTION_FRANCAIS", type text},
+            {"DETAIL_ELEMENT", type text}, {"DUREE_REPARATION", type number}, {"ELEMENT_VEHICULE", type text},
+            {"ETAT", type text}, {"KILOMETRAGE", type number}, {"LIEU", type text},
+            {"LIEU_INCIDENT_ARABE", type text}, {"LIEU_INCIDENT_FRANCAIS", type text},
+            {"LOCATION", type text}, {"MOIS", type text}, {"MOTIF_REFUS", type text},
+            {"NUMERO_DEMANDE", type text}, {"NUMERO_ORDRE_CAMION", type text}, {"PHOTO", type text},
+            {"PHOTO_URL", type text}, {"PIECES_NECESSAIRES", type text}, {"QUALIFICATION", type text},
+            {"SLA", type text}, {"SOURCE", type text}, {"STATUT", type text}, {"TOURNEE", type text},
+            {"TYPE_PANNE", type text}, {"TYPE_PANNE_ARABE", type text}, {"TYPE_PANNE_FRANCAIS", type text},
+            {"VEHICULE_ID", Int64.Type}, {"VEHICULE_IMMATRICULATION", type text},
+            {"VEHICULE_MARQUE", type text}, {"VEHICULE_MODELE", type text}, {"VEHICULE_TYPE", type text},
+            {"VIDEO", type text}, {"VIDEO_URL", type text}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // VEHICULES — vehicules.csv (34 colonnes)
+  // =====================================================================
+  table Vehicules {
+    annotation IsHiddenInReport = false;
+
+    column ID { dataType: int64; sourceColumn: "ID"; }
+    column AGENCE { dataType: string; sourceColumn: "AGENCE"; }
+    column ANNEE { dataType: int64; sourceColumn: "ANNEE"; }
+    column ARCHIVED { dataType: boolean; sourceColumn: "ARCHIVED"; }
+    column ARCHIVED_AT { dataType: dateTime; sourceColumn: "ARCHIVED_AT"; }
+    column ARCHIVED_BY { dataType: string; sourceColumn: "ARCHIVED_BY"; }
+    column BLOQUE_PAR { dataType: string; sourceColumn: "BLOQUE_PAR"; }
+    column BRANCH_CODE { dataType: string; sourceColumn: "BRANCH_CODE"; }
+    column CARBURANT { dataType: string; sourceColumn: "CARBURANT"; }
+    column CHAUFFEUR_ID { dataType: int64; sourceColumn: "CHAUFFEUR_ID"; }
+    column CHAUFFEUR_NOM { dataType: string; sourceColumn: "CHAUFFEUR_NOM"; }
+    column CONFORME { dataType: boolean; sourceColumn: "CONFORME"; }
+    column DATE_AFFECTATION { dataType: dateTime; sourceColumn: "DATE_AFFECTATION"; }
+    column DATE_BLOCAGE { dataType: dateTime; sourceColumn: "DATE_BLOCAGE"; }
+    column DATE_DEBLOCAGE { dataType: dateTime; sourceColumn: "DATE_DEBLOCAGE"; }
+    column DEBLOQUE_PAR { dataType: string; sourceColumn: "DEBLOQUE_PAR"; }
+    column DERNIERE_LATITUDE { dataType: double; sourceColumn: "DERNIERE_LATITUDE"; }
+    column DERNIERE_LONGITUDE { dataType: double; sourceColumn: "DERNIERE_LONGITUDE"; }
+    column DERNIERE_POSITION_DATE { dataType: dateTime; sourceColumn: "DERNIERE_POSITION_DATE"; }
+    column DERNIERE_VITESSE { dataType: double; sourceColumn: "DERNIERE_VITESSE"; }
+    column DOCUMENTS_DISPONIBLES { dataType: int64; sourceColumn: "DOCUMENTS_DISPONIBLES"; }
+    column GEOTAB_ID { dataType: string; sourceColumn: "GEOTAB_ID"; }
+    column IMMATRICULATION { dataType: string; sourceColumn: "IMMATRICULATION"; }
+    column KILOMETRAGE { dataType: double; sourceColumn: "KILOMETRAGE"; }
+    column MARQUE { dataType: string; sourceColumn: "MARQUE"; }
+    column MODELE { dataType: string; sourceColumn: "MODELE"; }
+    column MOTEUR_ALLUME { dataType: boolean; sourceColumn: "MOTEUR_ALLUME"; }
+    column NIVEAU_CARBURANT { dataType: double; sourceColumn: "NIVEAU_CARBURANT"; }
+    column NOTES { dataType: string; sourceColumn: "NOTES"; }
+    column RAISON_BLOCAGE { dataType: string; sourceColumn: "RAISON_BLOCAGE"; }
+    column STATUT { dataType: string; sourceColumn: "STATUT"; }
+    column TOURNEE { dataType: string; sourceColumn: "TOURNEE"; }
+    column TRUCK_NUMBER { dataType: string; sourceColumn: "TRUCK_NUMBER"; }
+    column TYPE { dataType: string; sourceColumn: "TYPE"; }
+    column VEHICLE_ID { dataType: string; sourceColumn: "VEHICLE_ID"; }
+
+    // Labels web du donut "Repartition vehicules par statut"
+    // (En Service / À l'Arrêt / Maintenance / Bloqués — statutChart du web)
+    column STATUT_LABEL {
+      dataType: string;
+      expression: SWITCH([STATUT],
+        "ACTIF", "En Service",
+        "DISPONIBLE", "En Service",
+        "ARRET", "À l'Arrêt",
+        "IMMOBILISE", "À l'Arrêt",
+        "MAINTENANCE", "Maintenance",
+        "BLOQUE", "Bloqués",
+        [STATUT]);
+    }
+
+    measure 'Total Vehicules' = COUNTROWS('Vehicules')
+      formatString: "#,##0";
+
+    measure 'En Service' = CALCULATE(COUNTROWS('Vehicules'), 'Vehicules'[STATUT] = "DISPONIBLE")
+      formatString: "#,##0";
+
+    measure 'A l Arret' = CALCULATE(COUNTROWS('Vehicules'), 'Vehicules'[STATUT] = "ARRET")
+      formatString: "#,##0";
+
+    measure 'En Maintenance' = CALCULATE(COUNTROWS('Vehicules'), 'Vehicules'[STATUT] = "MAINTENANCE")
+      formatString: "#,##0";
+
+    measure 'Bloques' = CALCULATE(COUNTROWS('Vehicules'), 'Vehicules'[STATUT] = "BLOQUE")
+      formatString: "#,##0";
+
+    measure 'Taux Utilisation' =
+      DIVIDE([En Service], MAX([Total Vehicules], 1)) * 100
+      formatString: "0.0";
+
+    measure 'Kilometrage Total' = SUM('Vehicules'[KILOMETRAGE])
+      formatString: "#,##0";
+
+    // Dashboard : % vehicules conformes (colonne CONFORME de vehicules.csv)
+    measure 'Conformite Vehicules' =
+      DIVIDE(
+        CALCULATE(COUNTROWS('Vehicules'), 'Vehicules'[CONFORME] = TRUE),
+        COUNTROWS('Vehicules'),
+        0
+      ) * 100
+      formatString: "0.0";
+
+    // Dashboard : consommation estimee (L/100km) par type de carburant
+    // (Essence ~10, Diesel ~8) - estimation documentee, pas de donnee conso reelle.
+    measure 'Conso Estimee (L/100km)' =
+      AVERAGEX(
+        ADDCOLUMNS('Vehicules', "TauxConso",
+          SWITCH('Vehicules'[CARBURANT], "Essence", 10, "Diesel", 8, 9)),
+        [TauxConso]
+      )
+      formatString: "0.0";
+
+    // Dashboard : objectif de consommation pour la jauge (cible fixe)
+    measure 'Objectif Conso' = 10
+      formatString: "0.0";
+
+    // Dashboard : score de conduite estime (base vitesse moyenne DERNIERE_VITESSE)
+    measure 'Score Conduite' =
+      VAR v = AVERAGE('Vehicules'[DERNIERE_VITESSE])
+      RETURN IF(ISBLANK(v), BLANK(), MAX(0, 100 - MAX(0, v - 50)))
+      formatString: "0";
+
+    // Dashboard : % vehicules "au ralenti" (vitesse < 5 km/h)
+    measure '% Ralenti' =
+      DIVIDE(
+        CALCULATE(COUNTROWS('Vehicules'), 'Vehicules'[DERNIERE_VITESSE] < 5),
+        COUNTROWS('Vehicules'),
+        0
+      ) * 100
+      formatString: "0.0";
+
+    partition 'vehicules' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/vehicules.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID", Int64.Type}, {"AGENCE", type text}, {"ANNEE", Int64.Type},
+            {"ARCHIVED", type logical}, {"ARCHIVED_AT", type datetime}, {"ARCHIVED_BY", type text},
+            {"BLOQUE_PAR", type text}, {"BRANCH_CODE", type text}, {"CARBURANT", type text},
+            {"CHAUFFEUR_ID", Int64.Type}, {"CHAUFFEUR_NOM", type text}, {"CONFORME", type logical},
+            {"DATE_AFFECTATION", type datetime}, {"DATE_BLOCAGE", type datetime},
+            {"DATE_DEBLOCAGE", type datetime}, {"DEBLOQUE_PAR", type text},
+            {"DERNIERE_LATITUDE", type number}, {"DERNIERE_LONGITUDE", type number},
+            {"DERNIERE_POSITION_DATE", type datetime}, {"DERNIERE_VITESSE", type number},
+            {"DOCUMENTS_DISPONIBLES", Int64.Type}, {"GEOTAB_ID", type text},
+            {"IMMATRICULATION", type text}, {"KILOMETRAGE", type number}, {"MARQUE", type text},
+            {"MODELE", type text}, {"MOTEUR_ALLUME", type logical}, {"NIVEAU_CARBURANT", type number},
+            {"NOTES", type text}, {"RAISON_BLOCAGE", type text}, {"STATUT", type text},
+            {"TOURNEE", type text}, {"TRUCK_NUMBER", type text}, {"TYPE", type text},
+            {"VEHICLE_ID", type text}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // CHECKLISTS — driver_checklists.csv (31 colonnes)
+  // =====================================================================
+  table Checklists {
+    annotation IsHiddenInReport = false;
+
+    column ID { dataType: int64; sourceColumn: "ID"; }
+    column BATTERIE { dataType: boolean; sourceColumn: "BATTERIE"; }
+    column CARROSSERIE { dataType: boolean; sourceColumn: "CARROSSERIE"; }
+    column CEINTURES_SECURITE { dataType: boolean; sourceColumn: "CEINTURES_SECURITE"; }
+    column CHAUFFEUR_ID { dataType: int64; sourceColumn: "CHAUFFEUR_ID"; }
+    column CHAUFFEUR_MATRICULE { dataType: string; sourceColumn: "CHAUFFEUR_MATRICULE"; }
+    column CHAUFFEUR_NOM { dataType: string; sourceColumn: "CHAUFFEUR_NOM"; }
+    column COMMENTAIRE_GENERAL { dataType: string; sourceColumn: "COMMENTAIRE_GENERAL"; }
+    column DATE_CHECKLIST { dataType: dateTime; sourceColumn: "DATE_CHECKLIST"; }
+    column DATE_VALIDATION { dataType: dateTime; sourceColumn: "DATE_VALIDATION"; }
+    column DEFAUTS_JSON { dataType: string; sourceColumn: "DEFAUTS_JSON"; }
+    column DOCUMENTS { dataType: boolean; sourceColumn: "DOCUMENTS"; }
+    column ESSUIE_GLACES { dataType: boolean; sourceColumn: "ESSUIE_GLACES"; }
+    column EST_CONFORME { dataType: boolean; sourceColumn: "EST_CONFORME"; }
+    column EXTINCTEUR { dataType: boolean; sourceColumn: "EXTINCTEUR"; }
+    column FEEDBACK { dataType: string; sourceColumn: "FEEDBACK"; }
+    column FEUX { dataType: boolean; sourceColumn: "FEUX"; }
+    column FREINS { dataType: boolean; sourceColumn: "FREINS"; }
+    column HUILE_NIVEAU { dataType: boolean; sourceColumn: "HUILE_NIVEAU"; }
+    column MESSAGE_ALERTE_ARABE { dataType: string; sourceColumn: "MESSAGE_ALERTE_ARABE"; }
+    column MOTIF_REFUS { dataType: string; sourceColumn: "MOTIF_REFUS"; }
+    column PNEUS { dataType: boolean; sourceColumn: "PNEUS"; }
+    column POST_REPAIR { dataType: boolean; sourceColumn: "POST_REPAIR"; }
+    column REPARATIONS_JSON { dataType: string; sourceColumn: "REPARATIONS_JSON"; }
+    column SIGNATURE { dataType: string; sourceColumn: "SIGNATURE"; }
+    column STATUT { dataType: string; sourceColumn: "STATUT"; }
+    column TOURNEE_ID { dataType: string; sourceColumn: "TOURNEE_ID"; }
+    column VALIDE_PAR { dataType: string; sourceColumn: "VALIDE_PAR"; }
+    column VEHICULE_ID { dataType: int64; sourceColumn: "VEHICULE_ID"; }
+    column VEHICULE_IMMATRICULATION { dataType: string; sourceColumn: "VEHICULE_IMMATRICULATION"; }
+
+    // Conforme : web affiche "Oui"/"Non"/"-"
+    column CONFORME_LABEL {
+      dataType: string;
+      expression: IF([EST_CONFORME] = TRUE, "Oui", IF([EST_CONFORME] = FALSE, "Non", "-"));
+    }
+
+    measure 'Nb Checklists' = COUNTROWS('Checklists')
+      formatString: "#,##0";
+
+    measure 'Non conformes (COMPLETE + non conforme)' = CALCULATE(COUNTROWS('Checklists'), 'Checklists'[STATUT] = "COMPLETE", 'Checklists'[EST_CONFORME] = FALSE)
+      formatString: "#,##0";
+
+    measure 'Reparations a valider (REPAIRE)' = CALCULATE(COUNTROWS('Checklists'), 'Checklists'[STATUT] = "REPAIRE")
+      formatString: "#,##0";
+
+    measure 'En attente de validation (PENDING)' = CALCULATE(COUNTROWS('Checklists'), 'Checklists'[STATUT] = "PENDING")
+      formatString: "#,##0";
+
+    measure 'Validees (VALIDATED)' = CALCULATE(COUNTROWS('Checklists'), 'Checklists'[STATUT] = "VALIDATED")
+      formatString: "#,##0";
+
+    measure 'Rejetees (REJECTED)' = CALCULATE(COUNTROWS('Checklists'), 'Checklists'[STATUT] = "REJECTED")
+      formatString: "#,##0";
+
+    // KPI web "Check-ups (30j)" : dateChecklist > now - 30 jours (totalCheckups30j backend)
+    measure 'Check-ups 30 jours' = CALCULATE(COUNTROWS('Checklists'), 'Checklists'[DATE_CHECKLIST] >= DATEVALUE(TODAY()) - 30)
+      formatString: "#,##0";
+
+    partition 'checklists' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/driver_checklists.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID", Int64.Type}, {"BATTERIE", type logical}, {"CARROSSERIE", type logical},
+            {"CEINTURES_SECURITE", type logical}, {"CHAUFFEUR_ID", Int64.Type},
+            {"CHAUFFEUR_MATRICULE", type text}, {"CHAUFFEUR_NOM", type text},
+            {"COMMENTAIRE_GENERAL", type text}, {"DATE_CHECKLIST", type datetime},
+            {"DATE_VALIDATION", type datetime}, {"DEFAUTS_JSON", type text},
+            {"DOCUMENTS", type logical}, {"ESSUIE_GLACES", type logical}, {"EST_CONFORME", type logical},
+            {"EXTINCTEUR", type logical}, {"FEEDBACK", type text}, {"FEUX", type logical},
+            {"FREINS", type logical}, {"HUILE_NIVEAU", type logical}, {"MESSAGE_ALERTE_ARABE", type text},
+            {"MOTIF_REFUS", type text}, {"PNEUS", type logical}, {"POST_REPAIR", type logical},
+            {"REPARATIONS_JSON", type text}, {"SIGNATURE", type text}, {"STATUT", type text},
+            {"TOURNEE_ID", type text}, {"VALIDE_PAR", type text}, {"VEHICULE_ID", Int64.Type},
+            {"VEHICULE_IMMATRICULATION", type text}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // ANOMALIES CHECKUP — anomalies_checkup.csv (28 colonnes)
+  // =====================================================================
+  table AnomaliesCheckup {
+    annotation IsHiddenInReport = false;
+
+    column ID { dataType: int64; sourceColumn: "ID"; }
+    column ANOMALIE_CODE { dataType: string; sourceColumn: "ANOMALIE_CODE"; }
+    column ASSIGNED_TO { dataType: string; sourceColumn: "ASSIGNED_TO"; }
+    column CATEGORIE { dataType: string; sourceColumn: "CATEGORIE"; }
+    column CHAUFFEUR_ID { dataType: int64; sourceColumn: "CHAUFFEUR_ID"; }
+    column CHAUFFEUR_NOM { dataType: string; sourceColumn: "CHAUFFEUR_NOM"; }
+    column CHECKUP_CODE { dataType: string; sourceColumn: "CHECKUP_CODE"; }
+    column CHECKUP_ID { dataType: int64; sourceColumn: "CHECKUP_ID"; }
+    column CREATED_AT { dataType: dateTime; sourceColumn: "CREATED_AT"; }
+    column CRITICITE { dataType: string; sourceColumn: "CRITICITE"; }
+    column DATE_DETECTION { dataType: dateTime; sourceColumn: "DATE_DETECTION"; }
+    column DATE_PRISE_EN_CHARGE { dataType: dateTime; sourceColumn: "DATE_PRISE_EN_CHARGE"; }
+    column DATE_REPARATION { dataType: dateTime; sourceColumn: "DATE_REPARATION"; }
+    column DATE_VALIDATION { dataType: dateTime; sourceColumn: "DATE_VALIDATION"; }
+    column DESCRIPTION { dataType: string; sourceColumn: "DESCRIPTION"; }
+    column ELEMENT { dataType: string; sourceColumn: "ELEMENT"; }
+    column OBSERVATION { dataType: string; sourceColumn: "OBSERVATION"; }
+    column PHOTO_URL { dataType: string; sourceColumn: "PHOTO_URL"; }
+    column REPARE_PAR { dataType: string; sourceColumn: "REPARE_PAR"; }
+    column RESOLUTION_NOTES { dataType: string; sourceColumn: "RESOLUTION_NOTES"; }
+    column SOURCE { dataType: string; sourceColumn: "SOURCE"; }
+    column STATUT { dataType: string; sourceColumn: "STATUT"; }
+    column TASK_ID { dataType: string; sourceColumn: "TASK_ID"; }
+    column UPDATED_AT { dataType: dateTime; sourceColumn: "UPDATED_AT"; }
+    column VALIDE_PAR { dataType: string; sourceColumn: "VALIDE_PAR"; }
+    column VEHICULE_ID { dataType: int64; sourceColumn: "VEHICULE_ID"; }
+    column VEHICULE_IMMATRICULATION { dataType: string; sourceColumn: "VEHICULE_IMMATRICULATION"; }
+
+    // Labels web ANOMALIE_STATUT_LABELS
+    column STATUT_LABEL {
+      dataType: string;
+      expression: SWITCH(
+        [STATUT], "DETECTEE", "Detectee", "EN_REPARATION", "En reparation",
+        "REPAREE", "Reparee", "NON_REPAREE", "Non reparable",
+        "VALIDEE", "Validee", "ANNULEE", "Annulee", [STATUT]
+      );
+    }
+
+    measure 'Nb Anomalies' = COUNTROWS('AnomaliesCheckup')
+      formatString: "#,##0";
+
+    measure 'Anomalies ouvertes' = CALCULATE(COUNTROWS('AnomaliesCheckup'), NOT 'AnomaliesCheckup'[STATUT] IN {"REPAREE", "VALIDEE", "ANNULEE"})
+      formatString: "#,##0";
+
+    measure 'Anomalies critiques' = CALCULATE(COUNTROWS('AnomaliesCheckup'), 'AnomaliesCheckup'[CRITICITE] = "CRITIQUE")
+      formatString: "#,##0";
+
+    measure 'Anomalies majeures' = CALCULATE(COUNTROWS('AnomaliesCheckup'), 'AnomaliesCheckup'[CRITICITE] = "MAJEURE")
+      formatString: "#,##0";
+
+    measure 'Anomalies mineures' = CALCULATE(COUNTROWS('AnomaliesCheckup'), 'AnomaliesCheckup'[CRITICITE] = "MINEURE")
+      formatString: "#,##0";
+
+    // Score de conduite estime par chauffeur : 100 - penalite moyenne
+    // (CRITIQUE = 15 pts, MAJEURE = 10 pts, MINEURE = 5 pts) plafonnee a 0.
+    measure 'Score Conduite Chauffeur' =
+      VAR nb = COUNTROWS('AnomaliesCheckup')
+      VAR penalites =
+        CALCULATE(COUNTROWS('AnomaliesCheckup'), 'AnomaliesCheckup'[CRITICITE] = "CRITIQUE") * 15 +
+        CALCULATE(COUNTROWS('AnomaliesCheckup'), 'AnomaliesCheckup'[CRITICITE] = "MAJEURE") * 10 +
+        CALCULATE(COUNTROWS('AnomaliesCheckup'), 'AnomaliesCheckup'[CRITICITE] = "MINEURE") * 5
+      RETURN IF(nb = 0, BLANK(), MAX(0, 100 - ROUND(DIVIDE(penalites, nb), 0)))
+      formatString: "0";
+
+    partition 'anomalies_checkup' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/anomalies_checkup.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID", Int64.Type}, {"ANOMALIE_CODE", type text}, {"ASSIGNED_TO", type text},
+            {"CATEGORIE", type text}, {"CHAUFFEUR_ID", Int64.Type}, {"CHAUFFEUR_NOM", type text},
+            {"CHECKUP_CODE", type text}, {"CHECKUP_ID", Int64.Type}, {"CREATED_AT", type datetime},
+            {"CRITICITE", type text}, {"DATE_DETECTION", type datetime},
+            {"DATE_PRISE_EN_CHARGE", type datetime}, {"DATE_REPARATION", type datetime},
+            {"DATE_VALIDATION", type datetime}, {"DESCRIPTION", type text}, {"ELEMENT", type text},
+            {"OBSERVATION", type text}, {"PHOTO_URL", type text}, {"REPARE_PAR", type text},
+            {"RESOLUTION_NOTES", type text}, {"SOURCE", type text}, {"STATUT", type text},
+            {"TASK_ID", type text}, {"UPDATED_AT", type datetime}, {"VALIDE_PAR", type text},
+            {"VEHICULE_ID", Int64.Type}, {"VEHICULE_IMMATRICULATION", type text}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // BUDGET TRIMESTRIEL — budget_trimestriel.csv (9 colonnes)
+  // =====================================================================
+  table BudgetTrimestriel {
+    annotation IsHiddenInReport = false;
+
+    column ID { dataType: int64; sourceColumn: "ID"; }
+    column ACTIF { dataType: boolean; sourceColumn: "ACTIF"; }
+    column ANNEE { dataType: int64; sourceColumn: "ANNEE"; }
+    column BUDGET_TOTAL { dataType: double; sourceColumn: "BUDGET_TOTAL"; }
+    column BUDGET_UTILISE { dataType: double; sourceColumn: "BUDGET_UTILISE"; }
+    column DATE_CREATION { dataType: dateTime; sourceColumn: "DATE_CREATION"; }
+    column DATE_DEBUT_PERIODE { dataType: dateTime; sourceColumn: "DATE_DEBUT_PERIODE"; }
+    column DATE_FIN_PERIODE { dataType: dateTime; sourceColumn: "DATE_FIN_PERIODE"; }
+    column TRIMESTRE { dataType: int64; sourceColumn: "TRIMESTRE"; }
+
+    // Periode affichee dans la carte web : "Periode: T{trimestre} {annee}"
+    column PERIODE_LABEL {
+      dataType: string;
+      expression: "T" & FORMAT([TRIMESTRE], "0") & " " & FORMAT([ANNEE], "0");
+    }
+
+    measure 'Budget Total' = SUM('BudgetTrimestriel'[BUDGET_TOTAL])
+      formatString: "#,##0";
+
+    measure 'Budget Utilise' = SUM('BudgetTrimestriel'[BUDGET_UTILISE])
+      formatString: "#,##0";
+
+    measure 'Budget Restant' = [Budget Total] - [Budget Utilise]
+      formatString: "#,##0";
+
+    measure 'Budget % Utilise' = DIVIDE([Budget Utilise], [Budget Total], 0) * 100
+      formatString: "0.0";
+
+    // Logique web budgetCheckResult.suffisant : budgetRestant > 0
+    measure 'Budget Suffisant' = IF([Budget Restant] > 0, "OUI", "NON");
+
+    partition 'budget_trimestriel' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/budget_trimestriel.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID", Int64.Type}, {"ACTIF", type logical}, {"ANNEE", Int64.Type},
+            {"BUDGET_TOTAL", type number}, {"BUDGET_UTILISE", type number},
+            {"DATE_CREATION", type datetime}, {"DATE_DEBUT_PERIODE", type datetime},
+            {"DATE_FIN_PERIODE", type datetime}, {"TRIMESTRE", Int64.Type}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // DOCUMENTS VEHICULE — documents_vehicule.csv (17 colonnes)
+  // =====================================================================
+  table DocumentsVehicule {
+    annotation IsHiddenInReport = false;
+
+    column ID { dataType: int64; sourceColumn: "ID"; }
+    column ARCHIVED { dataType: boolean; sourceColumn: "ARCHIVED"; }
+    column ARCHIVED_AT { dataType: dateTime; sourceColumn: "ARCHIVED_AT"; }
+    column ARCHIVED_BY { dataType: string; sourceColumn: "ARCHIVED_BY"; }
+    column CREATED_AT { dataType: dateTime; sourceColumn: "CREATED_AT"; }
+    column DATE_EMISSION { dataType: dateTime; sourceColumn: "DATE_EMISSION"; }
+    column DATE_EXPIRATION { dataType: dateTime; sourceColumn: "DATE_EXPIRATION"; }
+    column EST_DISPONIBLE { dataType: boolean; sourceColumn: "EST_DISPONIBLE"; }
+    column FICHIER_URL { dataType: string; sourceColumn: "FICHIER_URL"; }
+    column IMPORTE_PAR { dataType: string; sourceColumn: "IMPORTE_PAR"; }
+    column NOTES { dataType: string; sourceColumn: "NOTES"; }
+    column NUMERO_DOCUMENT { dataType: string; sourceColumn: "NUMERO_DOCUMENT"; }
+    column TYPE_DOCUMENT { dataType: string; sourceColumn: "TYPE_DOCUMENT"; }
+    column UPDATED_AT { dataType: dateTime; sourceColumn: "UPDATED_AT"; }
+    column VEHICULE_ID { dataType: int64; sourceColumn: "VEHICULE_ID"; }
+    column VEHICULE_IMMATRICULATION { dataType: string; sourceColumn: "VEHICULE_IMMATRICULATION"; }
+
+    // Labels web DOC_TYPES (8 types, ordre web exact)
+    column TYPE_DOCUMENT_LABEL {
+      dataType: string;
+      expression: SWITCH(
+        [TYPE_DOCUMENT],
+        "ASSURANCE", "Assurance",
+        "CARTE_GRISE", "Carte Grise",
+        "VISITE_TECHNIQUE", "Visite Technique",
+        "VIGNETTE", "Vignette",
+        "AUTORISATION", "Autorisation",
+        "CONTROLE_TACHYGRAPHE", "Contrôle Tachygraphe",
+        "ONSSA", "ONSSA",
+        "METROLOGIQUE", "Métrologique",
+        [TYPE_DOCUMENT]
+      );
+    }
+
+    // 5 types obligatoires (OBLIGATOIRE_TYPES du web)
+    column OBLIGATOIRE {
+      dataType: boolean;
+      expression: [TYPE_DOCUMENT] IN {"ASSURANCE", "CARTE_GRISE", "VISITE_TECHNIQUE", "CONTROLE_TACHYGRAPHE", "ONSSA"};
+    }
+
+    // Statut document : logique calculateStatus() exacte du web
+    column JOURS_RESTANTS {
+      dataType: int64;
+      expression:
+        VAR exp = [DATE_EXPIRATION]
+        RETURN IF(ISBLANK(exp), BLANK(), INT(DATEVALUE(exp) - DATEVALUE(TODAY())));
+    }
+
+    column STATUT_DOCUMENT {
+      dataType: string;
+      expression:
+        VAR exp = [DATE_EXPIRATION]
+        VAR dispo = [EST_DISPONIBLE]
+        VAR jours = IF(ISBLANK(exp), BLANK(), INT(DATEVALUE(exp) - DATEVALUE(TODAY())))
+        RETURN IF(dispo = FALSE, "MANQUANT",
+          IF(ISBLANK(jours), "MANQUANT",
+            IF(jours < 0, "EXPIRE",
+              IF(jours <= 30, "EXPIRE_BIENTOT", "VALIDE"))));
+    }
+
+    // Labels web statusConfig
+    column STATUT_DOCUMENT_LABEL {
+      dataType: string;
+      expression: SWITCH(
+        [STATUT_DOCUMENT],
+        "VALIDE", "Valide",
+        "EXPIRE_BIENTOT", "Expire bientôt",
+        "EXPIRE", "Expiré",
+        "MANQUANT", "Manquant",
+        [STATUT_DOCUMENT]
+      );
+    }
+
+    // Notifications web (NOTIFICATION_DELAYS = 30,15,7,1,0)
+    column GROUPE_EXPIRATION {
+      dataType: string;
+      expression:
+        VAR j = [JOURS_RESTANTS]
+        RETURN SWITCH(TRUE(),
+          ISBLANK(j), BLANK(),
+          j < 0, "Documents expirés",
+          j = 0, "Expire aujourd'hui",
+          j = 1, "Expire demain",
+          j <= 7, "Expire dans 7 jours",
+          j <= 15, "Expire dans 15 jours",
+          j <= 30, "Expire dans 30 jours",
+          "Plus de 30 jours");
+    }
+
+    measure 'Nb Documents' = COUNTROWS('DocumentsVehicule')
+      formatString: "#,##0";
+
+    measure 'Valides' = CALCULATE(COUNTROWS('DocumentsVehicule'), 'DocumentsVehicule'[STATUT_DOCUMENT] = "VALIDE")
+      formatString: "#,##0";
+
+    measure 'Expire bientot' = CALCULATE(COUNTROWS('DocumentsVehicule'), 'DocumentsVehicule'[STATUT_DOCUMENT] = "EXPIRE_BIENTOT")
+      formatString: "#,##0";
+
+    measure 'Expires' = CALCULATE(COUNTROWS('DocumentsVehicule'), 'DocumentsVehicule'[STATUT_DOCUMENT] = "EXPIRE")
+      formatString: "#,##0";
+
+    measure 'Manquants' = CALCULATE(COUNTROWS('DocumentsVehicule'), 'DocumentsVehicule'[STATUT_DOCUMENT] = "MANQUANT")
+      formatString: "#,##0";
+
+    // Conformite vehicule : % documents OBLIGATOIRES valides (logique web)
+    measure 'Conformite' =
+      DIVIDE(
+        CALCULATE(COUNTROWS('DocumentsVehicule'), 'DocumentsVehicule'[OBLIGATOIRE] = TRUE, 'DocumentsVehicule'[STATUT_DOCUMENT] IN {"VALIDE", "EXPIRE_BIENTOT"}),
+        CALCULATE(COUNTROWS('DocumentsVehicule'), 'DocumentsVehicule'[OBLIGATOIRE] = TRUE)
+      ) * 100
+      formatString: "0";
+
+    partition 'documents_vehicule' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/documents_vehicule.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID", Int64.Type}, {"ARCHIVED", type logical}, {"ARCHIVED_AT", type datetime},
+            {"ARCHIVED_BY", type text}, {"CREATED_AT", type datetime},
+            {"DATE_EMISSION", type datetime}, {"DATE_EXPIRATION", type datetime},
+            {"EST_DISPONIBLE", type logical}, {"FICHIER_URL", type text}, {"IMPORTE_PAR", type text},
+            {"NOTES", type text}, {"NUMERO_DOCUMENT", type text}, {"TYPE_DOCUMENT", type text},
+            {"UPDATED_AT", type datetime}, {"VEHICULE_ID", Int64.Type},
+            {"VEHICULE_IMMATRICULATION", type text}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // BLOCAGES VEHICULES — vehicle_blocking.csv (11 colonnes)
+  // =====================================================================
+  table VehicleBlocking {
+    annotation IsHiddenInReport = false;
+
+    column ID { dataType: int64; sourceColumn: "ID"; }
+    column ALERTE_ID { dataType: int64; sourceColumn: "ALERTE_ID"; }
+    column BLOQUE { dataType: boolean; sourceColumn: "BLOQUE"; }
+    column BLOQUE_PAR { dataType: string; sourceColumn: "BLOQUE_PAR"; }
+    column DATE_BLOCAGE { dataType: dateTime; sourceColumn: "DATE_BLOCAGE"; }
+    column DATE_DEBLOCAGE { dataType: dateTime; sourceColumn: "DATE_DEBLOCAGE"; }
+    column DEBLOQUE_PAR { dataType: string; sourceColumn: "DEBLOQUE_PAR"; }
+    column RAISON { dataType: string; sourceColumn: "RAISON"; }
+    column VEHICULE_ID { dataType: int64; sourceColumn: "VEHICULE_ID"; }
+    column VEHICULE_IMMATRICULATION { dataType: string; sourceColumn: "VEHICULE_IMMATRICULATION"; }
+
+    column BLOCAGE_LABEL {
+      dataType: string;
+      expression: IF([BLOQUE] = TRUE, "Bloque", "Debloque");
+    }
+
+    measure 'Nb Blocages' = COUNTROWS('VehicleBlocking')
+      formatString: "#,##0";
+
+    partition 'vehicle_blocking' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/vehicle_blocking.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID", Int64.Type}, {"ALERTE_ID", Int64.Type}, {"BLOQUE", type logical},
+            {"BLOQUE_PAR", type text}, {"DATE_BLOCAGE", type datetime},
+            {"DATE_DEBLOCAGE", type datetime}, {"DEBLOQUE_PAR", type text}, {"RAISON", type text},
+            {"VEHICULE_ID", Int64.Type}, {"VEHICULE_IMMATRICULATION", type text}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // DEPART HISTORIQUE — depart_historique.csv (23 colonnes)
+  // =====================================================================
+  table DepartHistorique {
+    annotation IsHiddenInReport = false;
+
+    column ID { dataType: int64; sourceColumn: "ID"; }
+    column BRANCH_CODE { dataType: string; sourceColumn: "BRANCH_CODE"; }
+    column CHAUFFEUR_ID { dataType: int64; sourceColumn: "CHAUFFEUR_ID"; }
+    column CHAUFFEUR_MATRICULE { dataType: string; sourceColumn: "CHAUFFEUR_MATRICULE"; }
+    column CHAUFFEUR_NOM { dataType: string; sourceColumn: "CHAUFFEUR_NOM"; }
+    column CHECKLIST_ID { dataType: int64; sourceColumn: "CHECKLIST_ID"; }
+    column DATE_CREATION { dataType: dateTime; sourceColumn: "DATE_CREATION"; }
+    column DATE_DEPART { dataType: dateTime; sourceColumn: "DATE_DEPART"; }
+    column DATE_SUPPRESSION { dataType: dateTime; sourceColumn: "DATE_SUPPRESSION"; }
+    column DELETED { dataType: boolean; sourceColumn: "DELETED"; }
+    column GPS_CITY { dataType: string; sourceColumn: "GPS_CITY"; }
+    column GPS_LATITUDE { dataType: double; sourceColumn: "GPS_LATITUDE"; }
+    column GPS_LONGITUDE { dataType: double; sourceColumn: "GPS_LONGITUDE"; }
+    column HEURE_DEPART { dataType: string; sourceColumn: "HEURE_DEPART"; }
+    column NUMERO_DEPART { dataType: string; sourceColumn: "NUMERO_DEPART"; }
+    column RESULTAT_CONTROLE { dataType: string; sourceColumn: "RESULTAT_CONTROLE"; }
+    column SITE { dataType: string; sourceColumn: "SITE"; }
+    column STATUT_VEHICULE { dataType: string; sourceColumn: "STATUT_VEHICULE"; }
+    column SUPPRIME_PAR { dataType: string; sourceColumn: "SUPPRIME_PAR"; }
+    column TIMESTAMP_DEPART { dataType: dateTime; sourceColumn: "TIMESTAMP_DEPART"; }
+    column TOURNEE_ID { dataType: string; sourceColumn: "TOURNEE_ID"; }
+    column VEHICULE_ID { dataType: int64; sourceColumn: "VEHICULE_ID"; }
+    column VEHICULE_IMMATRICULATION { dataType: string; sourceColumn: "VEHICULE_IMMATRICULATION"; }
+
+    measure 'Nb Departs' = COUNTROWS('DepartHistorique')
+      formatString: "#,##0";
+
+    measure 'Departs conformes' = CALCULATE(COUNTROWS('DepartHistorique'), 'DepartHistorique'[RESULTAT_CONTROLE] = "CONFORME")
+      formatString: "#,##0";
+
+    partition 'depart_historique' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/depart_historique.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID", Int64.Type}, {"BRANCH_CODE", type text}, {"CHAUFFEUR_ID", Int64.Type},
+            {"CHAUFFEUR_MATRICULE", type text}, {"CHAUFFEUR_NOM", type text},
+            {"CHECKLIST_ID", Int64.Type}, {"DATE_CREATION", type datetime},
+            {"DATE_DEPART", type datetime}, {"DATE_SUPPRESSION", type datetime},
+            {"DELETED", type logical}, {"GPS_CITY", type text}, {"GPS_LATITUDE", type number},
+            {"GPS_LONGITUDE", type number}, {"HEURE_DEPART", type text}, {"NUMERO_DEPART", type text},
+            {"RESULTAT_CONTROLE", type text}, {"SITE", type text}, {"STATUT_VEHICULE", type text},
+            {"SUPPRIME_PAR", type text}, {"TIMESTAMP_DEPART", type datetime},
+            {"TOURNEE_ID", type text}, {"VEHICULE_ID", Int64.Type},
+            {"VEHICULE_IMMATRICULATION", type text}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // TOURNEES — tournees.csv (18 colonnes)
+  // =====================================================================
+  table Tournees {
+    annotation IsHiddenInReport = false;
+
+    column ID { dataType: int64; sourceColumn: "ID"; }
+    column CHAUFFEUR_ID { dataType: int64; sourceColumn: "CHAUFFEUR_ID"; }
+    column CHAUFFEUR_NOM { dataType: string; sourceColumn: "CHAUFFEUR_NOM"; }
+    column DATE_CREATION { dataType: dateTime; sourceColumn: "DATE_CREATION"; }
+    column DATE_MODIFICATION { dataType: dateTime; sourceColumn: "DATE_MODIFICATION"; }
+    column DATE_TOURNEE { dataType: dateTime; sourceColumn: "DATE_TOURNEE"; }
+    column DISTANCE_TOTALE { dataType: double; sourceColumn: "DISTANCE_TOTALE"; }
+    column HEURE_DEBUT { dataType: string; sourceColumn: "HEURE_DEBUT"; }
+    column HEURE_FIN { dataType: string; sourceColumn: "HEURE_FIN"; }
+    column ID_TOURNEE { dataType: string; sourceColumn: "ID_TOURNEE"; }
+    column ITINERAIRE { dataType: string; sourceColumn: "ITINERAIRE"; }
+    column NOMBRE_ARRETS { dataType: int64; sourceColumn: "NOMBRE_ARRETS"; }
+    column NOTES { dataType: string; sourceColumn: "NOTES"; }
+    column NUMERO_TOURNEE { dataType: string; sourceColumn: "NUMERO_TOURNEE"; }
+    column SITE { dataType: string; sourceColumn: "SITE"; }
+    column STATUT { dataType: string; sourceColumn: "STATUT"; }
+    column VEHICULE_ID { dataType: int64; sourceColumn: "VEHICULE_ID"; }
+    column VEHICULE_IMMATRICULATION { dataType: string; sourceColumn: "VEHICULE_IMMATRICULATION"; }
+
+    measure 'Nb Tournees' = COUNTROWS('Tournees')
+      formatString: "#,##0";
+
+    measure 'Tournees terminees' = CALCULATE(COUNTROWS('Tournees'), 'Tournees'[STATUT] = "TERMINEE")
+      formatString: "#,##0";
+
+    measure 'Tournees en cours' = CALCULATE(COUNTROWS('Tournees'), 'Tournees'[STATUT] = "EN_COURS")
+      formatString: "#,##0";
+
+    partition 'tournees' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/tournees.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID", Int64.Type}, {"CHAUFFEUR_ID", Int64.Type}, {"CHAUFFEUR_NOM", type text},
+            {"DATE_CREATION", type datetime}, {"DATE_MODIFICATION", type datetime},
+            {"DATE_TOURNEE", type datetime}, {"DISTANCE_TOTALE", type number},
+            {"HEURE_DEBUT", type text}, {"HEURE_FIN", type text}, {"ID_TOURNEE", type text},
+            {"ITINERAIRE", type text}, {"NOMBRE_ARRETS", Int64.Type}, {"NOTES", type text},
+            {"NUMERO_TOURNEE", type text}, {"SITE", type text}, {"STATUT", type text},
+            {"VEHICULE_ID", Int64.Type}, {"VEHICULE_IMMATRICULATION", type text}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // UTILISATEURS — users.csv (38 colonnes)
+  // =====================================================================
+  table Utilisateurs {
+    annotation IsHiddenInReport = false;
+
+    column ID { dataType: int64; sourceColumn: "ID"; }
+    column BRANCH_CODE { dataType: string; sourceColumn: "BRANCH_CODE"; }
+    column CELLULAR_PHONE { dataType: string; sourceColumn: "CELLULAR_PHONE"; }
+    column CREATED_BY_ROLE_ID { dataType: int64; sourceColumn: "CREATED_BY_ROLE_ID"; }
+    column CREATION_DATE { dataType: dateTime; sourceColumn: "CREATION_DATE"; }
+    column EMAIL { dataType: string; sourceColumn: "EMAIL"; }
+    column EMAIL_VALIDATED { dataType: boolean; sourceColumn: "EMAIL_VALIDATED"; }
+    column FACE_DESCRIPTOR { dataType: string; sourceColumn: "FACE_DESCRIPTOR"; }
+    column FACE_REGISTERED { dataType: boolean; sourceColumn: "FACE_REGISTERED"; }
+    column FIRSTNAME { dataType: string; sourceColumn: "FIRSTNAME"; }
+    column HOLD_PERSON { dataType: string; sourceColumn: "HOLD_PERSON"; }
+    column HOLD_REASON { dataType: string; sourceColumn: "HOLD_REASON"; }
+    column HOLD_RELATED_ROLE { dataType: string; sourceColumn: "HOLD_RELATED_ROLE"; }
+    column HOLD_ROLE_BRANCH { dataType: string; sourceColumn: "HOLD_ROLE_BRANCH"; }
+    column LAST_CONNECTION_DATE { dataType: dateTime; sourceColumn: "LAST_CONNECTION_DATE"; }
+    column LAST_UPDATE { dataType: dateTime; sourceColumn: "LAST_UPDATE"; }
+    column NAME { dataType: string; sourceColumn: "NAME"; }
+    column PASSWORD { dataType: string; sourceColumn: "PASSWORD"; }
+    column PASSWORD_DIGEST { dataType: string; sourceColumn: "PASSWORD_DIGEST"; }
+    column PASSWORD_EXPIRY_DATE { dataType: dateTime; sourceColumn: "PASSWORD_EXPIRY_DATE"; }
+    column PASSWORD_RESET_TOKEN { dataType: string; sourceColumn: "PASSWORD_RESET_TOKEN"; }
+    column PASSWORD_RESET_TOKEN_EXPIRES_AT { dataType: dateTime; sourceColumn: "PASSWORD_RESET_TOKEN_EXPIRES_AT"; }
+    column PERSON_CODE { dataType: string; sourceColumn: "PERSON_CODE"; }
+    column PHONE { dataType: string; sourceColumn: "PHONE"; }
+    column PROFILE_CODE { dataType: string; sourceColumn: "PROFILE_CODE"; }
+    column ROLE { dataType: string; sourceColumn: "ROLE"; }
+    column ROLE_BRANCH { dataType: string; sourceColumn: "ROLE_BRANCH"; }
+    column ROLE_CODE { dataType: string; sourceColumn: "ROLE_CODE"; }
+    column ROLE_DEPARTEMENT { dataType: string; sourceColumn: "ROLE_DEPARTEMENT"; }
+    column STATUS { dataType: string; sourceColumn: "STATUS"; }
+    column USERNAME { dataType: string; sourceColumn: "USERNAME"; }
+    column VALIDATION_CODE { dataType: string; sourceColumn: "VALIDATION_CODE"; }
+    column VALIDATION_CODE_EXPIRES_AT { dataType: dateTime; sourceColumn: "VALIDATION_CODE_EXPIRES_AT"; }
+    column VILLE { dataType: string; sourceColumn: "VILLE"; }
+
+    measure 'Nb Utilisateurs' = COUNTROWS('Utilisateurs')
+      formatString: "#,##0";
+
+    measure 'Chauffeurs' = CALCULATE(COUNTROWS('Utilisateurs'), 'Utilisateurs'[ROLE] = "CHAUFFEUR")
+      formatString: "#,##0";
+
+    partition 'users' {
+      source =
+        let
+          Source = Csv.Document(File.Contents("C:/Users/moutaoch/Downloads/smart-fleet-master/powerbi_rs/dataset/users.csv"), [Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+          Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+          Typed = Table.TransformColumnTypes(Promoted, {
+            {"ID", Int64.Type}, {"BRANCH_CODE", type text}, {"CELLULAR_PHONE", type text},
+            {"CREATED_BY_ROLE_ID", Int64.Type}, {"CREATION_DATE", type datetime},
+            {"EMAIL", type text}, {"EMAIL_VALIDATED", type logical},
+            {"FACE_DESCRIPTOR", type text}, {"FACE_REGISTERED", type logical},
+            {"FIRSTNAME", type text}, {"HOLD_PERSON", type text}, {"HOLD_REASON", type text},
+            {"HOLD_RELATED_ROLE", type text}, {"HOLD_ROLE_BRANCH", type text},
+            {"LAST_CONNECTION_DATE", type datetime}, {"LAST_UPDATE", type datetime},
+            {"NAME", type text}, {"PASSWORD", type text}, {"PASSWORD_DIGEST", type text},
+            {"PASSWORD_EXPIRY_DATE", type datetime}, {"PASSWORD_RESET_TOKEN", type text},
+            {"PASSWORD_RESET_TOKEN_EXPIRES_AT", type datetime}, {"PERSON_CODE", type text},
+            {"PHONE", type text}, {"PROFILE_CODE", type text}, {"ROLE", type text},
+            {"ROLE_BRANCH", type text}, {"ROLE_CODE", type text}, {"ROLE_DEPARTEMENT", type text},
+            {"STATUS", type text}, {"USERNAME", type text}, {"VALIDATION_CODE", type text},
+            {"VALIDATION_CODE_EXPIRES_AT", type datetime}, {"VILLE", type text}
+          })
+        in
+          Typed;
+      mode: Import;
+    }
+  }
+
+  // =====================================================================
+  // RELATIONS (1:*) — clé étrangère exacte VEHICULE_ID / CHAUFFEUR_ID
+  // =====================================================================
+  relationship r_vehicules_declarations {
+    from: Vehicules.ID;
+    to: Declarations.VEHICULE_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+
+  relationship r_vehicules_checklists {
+    from: Vehicules.ID;
+    to: Checklists.VEHICULE_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+
+  relationship r_vehicules_documents {
+    from: Vehicules.ID;
+    to: DocumentsVehicule.VEHICULE_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+
+  relationship r_vehicules_anomalies {
+    from: Vehicules.ID;
+    to: AnomaliesCheckup.VEHICULE_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+
+  relationship r_vehicules_blocages {
+    from: Vehicules.ID;
+    to: VehicleBlocking.VEHICULE_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+
+  relationship r_vehicules_departs {
+    from: Vehicules.ID;
+    to: DepartHistorique.VEHICULE_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+
+  relationship r_vehicules_tournees {
+    from: Vehicules.ID;
+    to: Tournees.VEHICULE_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+
+  relationship r_users_declarations {
+    from: Utilisateurs.ID;
+    to: Declarations.CHAUFFEUR_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+
+  relationship r_users_checklists {
+    from: Utilisateurs.ID;
+    to: Checklists.CHAUFFEUR_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+
+  relationship r_users_anomalies {
+    from: Utilisateurs.ID;
+    to: AnomaliesCheckup.CHAUFFEUR_ID;
+    crossFilteringBehavior: oneDirection;
+  }
+}

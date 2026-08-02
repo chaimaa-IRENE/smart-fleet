@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "datasetReference": {
+    "byPath": {
+      "path": "../SmartFleetRS.SemanticModel"
+    },
+    "byConnection": null
+  },
+  "options": {
+    "defaultPageDisplayName": "Declarations"
+  }
+}

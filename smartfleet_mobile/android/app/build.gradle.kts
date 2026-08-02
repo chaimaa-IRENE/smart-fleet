@@ -33,6 +33,10 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // ML Kit (text recognition) bundles optional classes that R8 cannot resolve.
+            // Disable minification so the deliverable APK builds reliably.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

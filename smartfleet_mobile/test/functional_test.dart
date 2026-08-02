@@ -199,10 +199,6 @@ void main() {
 
     await declService.takeCharge(newId, 4, 'Presta 1');
     decl = await declDao.getById(newId);
-    expect(decl!['statut'], 'PRISE_EN_CHARGE');
-
-    await declService.markAsInProgress(newId);
-    decl = await declDao.getById(newId);
     expect(decl!['statut'], 'EN_COURS');
 
     await declService.markAsValidated(newId);
@@ -247,7 +243,7 @@ void main() {
     expect(stats['en_attente'], greaterThanOrEqualTo(0));
     expect(stats['cloture'], greaterThanOrEqualTo(1));
 
-    print('  ✓ Workflow Declarations: 7 statuts (EN_ATTENTE→PRISE_EN_CHARGE→EN_COURS→EN_VALIDATION→TRAITE→CLOTURE + RETOURNEE + REJETEE)');
+    print('  ✓ Workflow Declarations: 7 statuts (EN_ATTENTE→EN_COURS→EN_VALIDATION→TRAITE→CLOTURE + RETOURNEE + REJETEE)');
   });
 
   test('6. Checklist + Moteur de Decision', () async {
@@ -805,6 +801,35 @@ void main() {
         reason: 'Only 1 enabled');
 
     print('  ✓ Biometric Devices: CRUD + enable/disable OK');
+  });
+
+  test('22. Affectations admin → véhicules chauffeur (Checkup / Déclarations / Agent IA)', () async {
+    final vehicleService = VehicleService();
+
+    final all = await vehicleService.getAll();
+    expect(all.length, 3, reason: '3 véhicules seed');
+
+    final mine = await vehicleService.getMyVehicles(3);
+    final immats = mine.map((v) => v['immatriculation']).toList();
+    expect(immats, containsAll(['AA-123-BC', 'BB-456-CD']),
+        reason: 'Chauffeur 3 affecté aux véhicules AA-123-BC et BB-456-CD');
+    expect(immats, isNot(contains('CC-789-EF')),
+        reason: 'CC-789-EF non affecté → absent des 3 écrans chauffeur');
+
+    final presta = await vehicleService.getMyVehicles(4);
+    expect(presta, isEmpty, reason: 'Compte non-chauffeur ne voit aucun véhicule');
+
+    final cc = await vehicleService.getByImmat('CC-789-EF');
+    await vehicleService.update(cc!['id'] as int, {
+      'chauffeurId': 3,
+      'chauffeurNom': 'Jean Chauffeur',
+    });
+
+    final after = await vehicleService.getMyVehicles(3);
+    expect(after.map((v) => v['immatriculation']), contains('CC-789-EF'),
+        reason: 'Affectation admin (chauffeurId) répercutée sur getMyVehicles');
+
+    print('  ✓ Affectations: getMyVehicles(3) = ${immats.join(', ')} → + CC-789-EF après affectation admin');
   });
 
   tearDownAll(() async {

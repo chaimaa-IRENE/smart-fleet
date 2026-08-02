@@ -60,12 +60,17 @@ class DeclarationDao {
 
   Future<int> update(int id, Map<String, dynamic> declaration) async {
     final db = await _db.database;
-    return await db.update(
-      'declarations',
-      declaration,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    final copy = Map<String, dynamic>.from(declaration);
+    try {
+      return await db.update(
+        'declarations',
+        copy,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception('declarations.update(id=$id, keys=${copy.keys}): $e');
+    }
   }
 
   Future<int> updateStatus(

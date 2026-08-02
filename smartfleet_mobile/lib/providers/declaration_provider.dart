@@ -20,7 +20,8 @@ class DeclarationProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
-      _declarations = await _service.getAll();
+      final raw = await _service.getAll();
+      _declarations = raw.map((m) => Map<String, dynamic>.from(m)).toList();
     } catch (e) {
       _error = e.toString();
     }
@@ -33,7 +34,8 @@ class DeclarationProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
-      _declarations = await _service.getMyDeclarations(chauffeurId);
+      final raw = await _service.getMyDeclarations(chauffeurId);
+      _declarations = raw.map((m) => Map<String, dynamic>.from(m)).toList();
     } catch (e) {
       _error = e.toString();
     }
@@ -59,7 +61,7 @@ class DeclarationProvider extends ChangeNotifier {
     try {
       await _service.update(id, data);
       final idx = _declarations.indexWhere((d) => d['id'] == id);
-      if (idx >= 0) _declarations[idx] = data;
+      if (idx >= 0) _declarations[idx] = Map<String, dynamic>.from(data);
       notifyListeners();
       return true;
     } catch (e) {
@@ -88,24 +90,11 @@ class DeclarationProvider extends ChangeNotifier {
       await _service.takeCharge(id, prestataireId, prestataireNom);
       final idx = _declarations.indexWhere((d) => d['id'] == id);
       if (idx >= 0) {
-        _declarations[idx]['statut'] = 'PRISE_EN_CHARGE';
-        _declarations[idx]['prestataireId'] = prestataireId;
-        _declarations[idx]['prestataireNom'] = prestataireNom;
+        _declarations[idx] = Map<String, dynamic>.from(_declarations[idx])
+          ..['statut'] = 'EN_COURS'
+          ..['prestataireId'] = prestataireId
+          ..['prestataireNom'] = prestataireNom;
       }
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      return false;
-    }
-  }
-
-  Future<bool> startWork(int id) async {
-    try {
-      await _service.startWork(id);
-      final idx = _declarations.indexWhere((d) => d['id'] == id);
-      if (idx >= 0) _declarations[idx]['statut'] = 'EN_COURS';
       notifyListeners();
       return true;
     } catch (e) {
@@ -125,6 +114,7 @@ class DeclarationProvider extends ChangeNotifier {
     int? dureeReparation,
     String? etatReparation,
     String? dateReparation,
+    String? devise,
   }) async {
     try {
       await _service.submitForValidation(
@@ -137,27 +127,26 @@ class DeclarationProvider extends ChangeNotifier {
         dureeReparation: dureeReparation,
         etatReparation: etatReparation,
         dateReparation: dateReparation,
+        devise: devise,
       );
       final idx = _declarations.indexWhere((d) => d['id'] == id);
       if (idx >= 0) {
-        _declarations[idx]['statut'] = 'EN_VALIDATION';
-        if (solution != null) _declarations[idx]['solution'] = solution;
-        if (actionsRealisees != null)
-          _declarations[idx]['actionsRealisees'] = actionsRealisees;
-        if (piecesNecessaires != null)
-          _declarations[idx]['piecesNecessaires'] = piecesNecessaires;
-        if (contratBonCommande != null)
-          _declarations[idx]['contratBonCommande'] = contratBonCommande;
-        if (coutReel != null) _declarations[idx]['coutReel'] = coutReel;
-        if (dureeReparation != null)
-          _declarations[idx]['dureeReparation'] = dureeReparation;
-        if (etatReparation != null)
-          _declarations[idx]['etatReparation'] = etatReparation;
+        final updated = Map<String, dynamic>.from(_declarations[idx]);
+        updated['statut'] = 'EN_VALIDATION';
+        if (solution != null) updated['solution'] = solution;
+        if (actionsRealisees != null) updated['actionsRealisees'] = actionsRealisees;
+        if (piecesNecessaires != null) updated['piecesNecessaires'] = piecesNecessaires;
+        if (contratBonCommande != null) updated['contratBonCommande'] = contratBonCommande;
+        if (coutReel != null) updated['coutReel'] = coutReel;
+        if (dureeReparation != null) updated['dureeReparation'] = dureeReparation;
+        if (etatReparation != null) updated['etat'] = etatReparation;
+        if (devise != null) updated['devise'] = devise;
+        _declarations[idx] = updated;
       }
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = 'Erreur soumission #$id: $e';
       notifyListeners();
       return false;
     }
@@ -222,20 +211,6 @@ class DeclarationProvider extends ChangeNotifier {
         _declarations[idx]['statut'] = 'CLOTURE';
         if (coutReel != null) _declarations[idx]['coutReel'] = coutReel;
       }
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      return false;
-    }
-  }
-
-  Future<bool> markAsInProgress(int id) async {
-    try {
-      await _service.markAsInProgress(id);
-      final idx = _declarations.indexWhere((d) => d['id'] == id);
-      if (idx >= 0) _declarations[idx]['statut'] = 'EN_COURS';
       notifyListeners();
       return true;
     } catch (e) {

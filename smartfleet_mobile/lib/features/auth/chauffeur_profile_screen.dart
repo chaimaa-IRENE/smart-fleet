@@ -74,13 +74,13 @@ class _ChauffeurProfileScreenState extends State<ChauffeurProfileScreen> {
                     style: TextStyle(
                       fontSize: 22, fontWeight: FontWeight.w700,
                       color: isDark ? Colors.white : AppTheme.textPrimary,
-                    )),
+                    ), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Text(user?['email'] as String? ?? '',
-                    style: const TextStyle(color: AppTheme.textSecondary)),
+                    style: const TextStyle(color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Text(user?['matricule'] as String? ?? '',
-                    style: TextStyle(color: AppTheme.textSecondary.withValues(alpha: 0.6), fontSize: 13)),
+                    style: TextStyle(color: AppTheme.textSecondary.withValues(alpha: 0.6), fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -93,7 +93,7 @@ class _ChauffeurProfileScreenState extends State<ChauffeurProfileScreen> {
                       style: TextStyle(
                         color: AppTheme.primary,
                         fontWeight: FontWeight.w600, fontSize: 14,
-                      )),
+                      ), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
               ],
             ),
@@ -219,12 +219,12 @@ class _ChauffeurProfileScreenState extends State<ChauffeurProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+                  style: TextStyle(fontSize: 12, color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
               Text(value,
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                     color: isDark ? Colors.white : AppTheme.textPrimary,
-                  )),
+                  ), maxLines: 1, overflow: TextOverflow.ellipsis),
             ],
           ),
         ],

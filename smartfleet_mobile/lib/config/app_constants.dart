@@ -217,6 +217,17 @@ class AppConstants {
     'DEVIS': 'Devis',
   };
 
+  static const List<String> deviseOptions = ['EUR', 'MAD', 'USD', 'GBP', 'CHF', 'CAD'];
+
+  static const Map<String, String> deviseLabels = {
+    'EUR': 'Euro (€)',
+    'MAD': 'Dirham (MAD)',
+    'USD': 'Dollar (\$)',
+    'GBP': 'Livre (£)',
+    'CHF': 'Franc suisse (CHF)',
+    'CAD': 'Dollar canadien (CAD)',
+  };
+
   static const List<String> etatReparationOptions = [
     'TRAITE',
     'NON_TRAITE',

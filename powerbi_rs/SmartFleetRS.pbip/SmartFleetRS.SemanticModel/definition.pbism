@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "settings": {
+    "allowNativeQueries": true,
+    "maxParallelismPerImport": -1,
+    "hybridDeltaPolicy": null,
+    "disableParallelLoadOfNewArtifacts": false,
+    "applyAllTransformationsBeforeLoad": false
+  }
+}

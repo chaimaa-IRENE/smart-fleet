@@ -9,6 +9,9 @@ class UserService {
 
   Future<List<Map<String, dynamic>>> getByRole(String role) => _dao.getByRole(role);
 
+  Future<Map<String, dynamic>?> getByMatricule(String matricule) =>
+      _dao.getByMatricule(matricule);
+
   Future<int> create(Map<String, dynamic> data) => _dao.insert(data);
 
   Future<int> update(int id, Map<String, dynamic> data) => _dao.update(id, data);

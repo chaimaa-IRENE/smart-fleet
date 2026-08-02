@@ -89,4 +89,18 @@ class UserDao {
         })
         .toList();
   }
+
+  /// Retourne l'utilisateur actif correspondant à un matricule (chauffeur).
+  Future<Map<String, dynamic>?> getByMatricule(String matricule) async {
+    final db = await _db.database;
+    final results = await db.query(
+      'utilisateurs',
+      where: 'LOWER(matricule) = LOWER(?) AND actif = 1',
+      whereArgs: [matricule.trim()],
+    );
+    if (results.isEmpty) return null;
+    final user = Map<String, dynamic>.from(results.first);
+    user.remove('motDePasse');
+    return user;
+  }
 }

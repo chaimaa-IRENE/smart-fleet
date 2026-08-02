@@ -60,7 +60,9 @@ class _CreateDeclarationState extends State<CreateDeclaration> {
   }
 
   Future<void> _loadVehicules() async {
-    final v = await _vehicleSvc.getAll();
+    final userId = context.read<AuthProvider>().userId;
+    if (userId == null) return;
+    final v = await _vehicleSvc.getMyVehicles(userId);
     if (mounted) setState(() => _vehicules = v);
   }
 

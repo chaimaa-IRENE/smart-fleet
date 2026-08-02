@@ -3,14 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../config/app_sizes.dart';
-import '../../config/translations.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/declaration_service.dart';
 import '../../services/vehicle_service.dart';
 import '../../widgets/danone_app_bar.dart';
 import '../../widgets/premium/glass_card.dart';
 import '../../widgets/premium/premium_kpi_card.dart';
-import '../../widgets/barcode_scanner_dialog.dart';
 import '../../services/sync_service.dart';
 
 class ChauffeurHome extends StatefulWidget {
@@ -23,16 +21,11 @@ class ChauffeurHome extends StatefulWidget {
 class _ChauffeurHomeState extends State<ChauffeurHome> {
   int _decCount = 0;
   int _vehCount = 0;
-  int _syncing = 0;
 
   @override
   void initState() {
     super.initState();
     _loadStats();
-  }
-
-  Future<void> _openBarcodeTest() async {
-    await BarcodeScannerDialog.show(context);
   }
 
   Future<void> _loadStats() async {
@@ -109,7 +102,7 @@ class _ChauffeurHomeState extends State<ChauffeurHome> {
                     style: const TextStyle(
                       fontSize: 22, fontWeight: FontWeight.w700,
                       color: AppTheme.textPrimary,
-                    )),
+                    ), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Text('Prêt pour une nouvelle journée ?',
                     style: TextStyle(color: AppTheme.textSecondary)),
@@ -205,13 +198,6 @@ class _ChauffeurHomeState extends State<ChauffeurHome> {
                 color: Colors.teal,
                 onTap: () => context.go('/chauffeur/documents'),
               )),
-              const SizedBox(width: 12),
-              Expanded(child: _ActionTile(
-                icon: Icons.qr_code_scanner,
-                label: 'Code-barres',
-                color: Colors.deepPurple,
-                onTap: _openBarcodeTest,
-              )),
             ],
           ),
           const SizedBox(height: 24),
@@ -226,14 +212,11 @@ class _ActionTile extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
-  final double iconSize;
-
   const _ActionTile({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
-    this.iconSize = 28,
   });
 
   @override
@@ -276,7 +259,7 @@ class _ActionTile extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, size: iconSize, color: color),
+                  Icon(icon, size: 28, color: color),
                   const SizedBox(height: 8),
                   Text(label,
                       textAlign: TextAlign.center,

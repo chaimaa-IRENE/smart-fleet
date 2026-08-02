@@ -4,6 +4,11 @@ import 'package:path/path.dart';
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._();
   static Database? _database;
+  static Future<Database>? _initFuture;
+
+  /// Surcharge du répertoire de base des bases de données, utilisée par les
+  /// tests pour isoler chaque fichier de test sur sa propre base.
+  static String? testDatabasesPathOverride;
 
   DatabaseHelper._();
 
@@ -11,34 +16,49 @@ class DatabaseHelper {
 
   static void resetForTesting() {
     _database = null;
+    _initFuture = null;
   }
 
   static Future<void> closeForTesting() async {
     if (_database != null) {
       await _database!.close();
       _database = null;
+      _initFuture = null;
     }
   }
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDatabase();
+    _initFuture ??= _initDatabase();
+    try {
+      _database = await _initFuture;
+    } catch (e) {
+      _initFuture = null;
+      rethrow;
+    }
     return _database!;
   }
 
   Future<Database> _initDatabase() async {
-    final dbPath = await getDatabasesPath();
+    final dbPath = testDatabasesPathOverride ?? await getDatabasesPath();
     final path = join(dbPath, 'smartfleet.db');
 
-    return await openDatabase(
-      path,
-      version: 8,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-      onConfigure: (db) async {
-        await db.execute('PRAGMA foreign_keys = ON');
-      },
-    );
+    try {
+      return await openDatabase(
+        path,
+        version: 10,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+        onConfigure: (db) async {
+          try {
+            await db.execute('PRAGMA foreign_keys = ON');
+            await db.execute('PRAGMA journal_mode = WAL');
+          } catch (_) {}
+        },
+      );
+    } catch (e) {
+      throw Exception('DB init: $e');
+    }
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -187,7 +207,31 @@ class DatabaseHelper {
       await db.execute('ALTER TABLE declarations ADD COLUMN contratBonCommande TEXT');
     }
     if (oldVersion < 8) {
-      await db.execute('ALTER TABLE declarations ADD COLUMN criticite TEXT');
+      try {
+        await db.execute('ALTER TABLE declarations ADD COLUMN criticite TEXT');
+      } catch (_) {}
+    }
+    if (oldVersion < 9) {
+      try {
+        await db.execute('ALTER TABLE declarations ADD COLUMN dateDebutIntervention TEXT');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE declarations ADD COLUMN devise TEXT DEFAULT "EUR"');
+      } catch (_) {}
+    }
+    if (oldVersion < 10) {
+      try {
+        await db.execute('ALTER TABLE documents_vehicule ADD COLUMN responsableNom TEXT');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE documents_vehicule ADD COLUMN dureeValiditeMois INTEGER DEFAULT 12');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE documents_vehicule ADD COLUMN piecesJointes TEXT');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE documents_vehicule ADD COLUMN historique TEXT');
+      } catch (_) {}
     }
   }
 
@@ -252,6 +296,7 @@ class DatabaseHelper {
         dateReparation TEXT, dureeReparation INTEGER,
         etat TEXT, actionsRealisees TEXT, piecesNecessaires TEXT,
         qualification TEXT, contratBonCommande TEXT,
+        dateDebutIntervention TEXT, devise TEXT DEFAULT 'EUR',
         FOREIGN KEY (chauffeurId) REFERENCES utilisateurs(id),
         FOREIGN KEY (immatriculation) REFERENCES vehicules(immatriculation)
       )
@@ -388,6 +433,8 @@ class DatabaseHelper {
         notes TEXT, archived INTEGER DEFAULT 0,
         importePar TEXT, createdAt TEXT, updatedAt TEXT,
         archivedAt TEXT, archivedBy TEXT,
+        responsableNom TEXT, dureeValiditeMois INTEGER DEFAULT 12,
+        piecesJointes TEXT, historique TEXT,
         FOREIGN KEY (vehiculeId) REFERENCES vehicules(id)
       )
     ''');

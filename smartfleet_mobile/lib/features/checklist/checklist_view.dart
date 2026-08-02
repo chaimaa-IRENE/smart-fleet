@@ -1,19 +1,21 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/checklist_service.dart';
 import '../../services/vehicle_service.dart';
-import '../../services/qr_code_service.dart';
+import '../../services/document_service.dart';
+import '../../services/scan_code_service.dart';
 import '../../services/decision/moteur_decision_service.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/signature_pad.dart';
 import '../../widgets/barcode_scanner_dialog.dart';
+import '../../utils/nv21_conversion.dart';
 
 class ChecklistView extends StatefulWidget {
   const ChecklistView({super.key});
@@ -25,7 +27,6 @@ class ChecklistView extends StatefulWidget {
 class _ChecklistViewState extends State<ChecklistView> {
   final ChecklistService _svc = ChecklistService();
   final VehicleService _vehicleSvc = VehicleService();
-  final QrCodeService _qrSvc = QrCodeService();
   final MoteurDecisionService _moteur = MoteurDecisionService();
   List<Map<String, dynamic>> _templates = [];
   List<Map<String, dynamic>> _sessions = [];
@@ -177,6 +178,7 @@ class _ChecklistViewState extends State<ChecklistView> {
               backgroundColor: AppTheme.success,
             ),
           );
+          _checkDepartureAuthorization(_currentImmat);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -635,22 +637,328 @@ class _ChecklistViewState extends State<ChecklistView> {
     });
   }
 
+  /// Ouvre le scanner code-barres du checkup : caméra en direct (multi-format)
+  /// ou image importée (gallery) pour tester des photos réelles.
   Future<void> _openBarcodeScanner() async {
-    final code = await BarcodeScannerDialog.show(context);
-    if (code != null && mounted) {
-      final firstItem = _itemValues.keys.firstOrNull;
-      if (firstItem != null) {
-        final existing = _commentCtrls[firstItem]?.text ?? '';
-        _commentCtrls[firstItem]?.text = existing.isEmpty ? code : '$existing\n[Code-barres] $code';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Code ajouté à "${_getItemName(firstItem)}"'),
-            backgroundColor: AppTheme.success,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+    final source = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            const Text(
+              'Scanner code-barres / QR',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Caméra en direct ou photo importée (gallery)',
+              style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppTheme.primary),
+              title: const Text('Scanner avec la caméra'),
+              subtitle: const Text('QR + codes-barres (EAN, Code 128, Code 39, UPC…) en continu'),
+              onTap: () => Navigator.pop(ctx, 'camera'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppTheme.accent),
+              title: const Text('Importer une image'),
+              subtitle: const Text('Photo de code collé sur véhicule / document'),
+              onTap: () => Navigator.pop(ctx, 'image'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || source == null) return;
+    if (source == 'camera') {
+      final code = await BarcodeScannerDialog.show(context);
+      if (code != null && code.trim().isNotEmpty && mounted) {
+        _handleScannedCode(code.trim());
       }
+    } else if (source == 'image') {
+      await _scanFromImage();
     }
+  }
+
+  /// Décode un code-barres / QR depuis une image importée (gallery), via
+  /// ML Kit (`InputImage.fromFilePath`). Utile pour tester des photos réelles.
+  Future<void> _scanFromImage() async {
+    if (!mounted) return;
+    final picker = ImagePicker();
+    final XFile? file = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1920,
+      imageQuality: 90,
+    );
+    if (file == null || !mounted) return;
+
+    // Indicateur d'analyse.
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 12),
+                Text('Analyse de l\'image…'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    String? code;
+    BarcodeFormat? format;
+    String? error;
+    try {
+      final inputImage = InputImage.fromFilePath(file.path);
+      final scanner = BarcodeScanner(formats: [BarcodeFormat.all]);
+      try {
+        final barcodes = await scanner.processImage(inputImage);
+        final valid =
+            barcodes.where((b) => (b.rawValue ?? '').trim().isNotEmpty).toList();
+        if (valid.isNotEmpty) {
+          code = valid.first.rawValue!.trim();
+          format = valid.first.format;
+        }
+      } finally {
+        scanner.close();
+      }
+    } catch (e) {
+      error = '$e';
+    }
+
+    if (!mounted) return;
+    Navigator.of(context).pop(); // ferme l'indicateur
+
+    if (code == null || code.isEmpty) {
+      await _showImageResult(
+        ok: false,
+        format: null,
+        code: null,
+        error: error,
+      );
+      return;
+    }
+
+    _handleScannedCode(code);
+    await _showImageResult(
+      ok: true,
+      format: format,
+      code: code,
+      error: error,
+    );
+  }
+
+  /// Affiche le résultat du décodage d'une image importée.
+  Future<void> _showImageResult({
+    required bool ok,
+    required BarcodeFormat? format,
+    required String? code,
+    String? error,
+  }) async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: Icon(
+          ok ? Icons.check_circle : Icons.error_outline,
+          color: ok ? AppTheme.success : AppTheme.danger,
+          size: 36,
+        ),
+        title: Text(ok ? 'Code détecté' : 'Aucun code détecté'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (ok) ...[
+              _kv('Format', _formatName(format)),
+              const SizedBox(height: 8),
+              _kv('Contenu', code ?? ''),
+              const SizedBox(height: 12),
+              const Text(
+                'Le contenu a été ajouté au commentaire du premier élément.',
+                style: TextStyle(fontSize: 13),
+              ),
+            ] else ...[
+              const Text(
+                'Cette image ne contient aucun code-barres ou QR lisible. '
+                'Vérifiez :\n'
+                '• la netteté de la photo\n'
+                '• l\'éclairage\n'
+                '• que le code est standard (EAN, Code 128, Code 39, …)',
+                style: TextStyle(fontSize: 13),
+              ),
+              if (error != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Erreur technique : $error',
+                  style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                ),
+              ],
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatName(BarcodeFormat? format) {
+    switch (format) {
+      case BarcodeFormat.qrCode: return 'QR Code';
+      case BarcodeFormat.ean8: return 'EAN-8';
+      case BarcodeFormat.ean13: return 'EAN-13';
+      case BarcodeFormat.upca: return 'UPC-A';
+      case BarcodeFormat.upce: return 'UPC-E';
+      case BarcodeFormat.code39: return 'Code 39';
+      case BarcodeFormat.code93: return 'Code 93';
+      case BarcodeFormat.code128: return 'Code 128';
+      case BarcodeFormat.codabar: return 'Codabar';
+      case BarcodeFormat.itf: return 'ITF';
+      case BarcodeFormat.dataMatrix: return 'Data Matrix';
+      case BarcodeFormat.pdf417: return 'PDF417';
+      case BarcodeFormat.aztec: return 'Aztec';
+      default: return 'Inconnu';
+    }
+  }
+
+  Widget _kv(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label : ',
+            style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textSecondary),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Ajoute le code scanné au commentaire du premier élément de la checklist.
+  void _handleScannedCode(String code) {
+    if (!mounted) return;
+    final firstItem = _itemValues.keys.firstOrNull;
+    if (firstItem == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aucun élément de checklist disponible'),
+          backgroundColor: AppTheme.danger,
+        ),
+      );
+      return;
+    }
+    final existing = _commentCtrls[firstItem]?.text ?? '';
+    _commentCtrls[firstItem]?.text =
+        existing.isEmpty ? code : '$existing\n[Code-barres] $code';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Code ajouté à "${_getItemName(firstItem)}"'),
+        backgroundColor: AppTheme.success,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> _checkDepartureAuthorization(String immat) async {
+    if (!mounted) return;
+    try {
+      final docSvc = DocumentVehiculeService();
+      final documents = await docSvc.getByVehicule(_currentVehiculeId ?? 0);
+      final expired = documents.where((d) => docSvc.getStatutDocument(d) == 'EXPIRE').toList();
+      final expiringSoon = documents.where((d) => docSvc.getStatutDocument(d) == 'BIENTOT_EXPIRE').toList();
+
+      final blocked = _vehicules.where((v) => v['id'] == _currentVehiculeId && v['statut'] == 'BLOQUE').isNotEmpty;
+      final nonConforme = _itemValues.values.any((v) => v == false);
+
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Row(children: [
+            Icon(expired.isEmpty && !blocked && !nonConforme ? Icons.check_circle : Icons.warning, color: expired.isEmpty && !blocked && !nonConforme ? AppTheme.success : AppTheme.danger),
+            const SizedBox(width: 8),
+            const Text('Autorisation de départ'),
+          ]),
+          content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Véhicule: $immat', style: const TextStyle(fontWeight: FontWeight.bold)),
+            const Divider(),
+            _departRow('Conformité check-up', !nonConforme, nonConforme ? 'Non conforme' : 'OK'),
+            _departRow('Statut véhicule', !blocked, blocked ? 'BLOQUÉ' : 'Disponible'),
+            if (expired.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              const Text('Documents expirés:', style: TextStyle(color: AppTheme.danger, fontWeight: FontWeight.w600)),
+              ...expired.map((d) => Text('  • ${d['type'] ?? ''} (${d['dateExpiration'] ?? ''})', style: const TextStyle(fontSize: 13, color: AppTheme.danger))),
+            ],
+            if (expiringSoon.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              const Text('Documents bientôt expirés:', style: TextStyle(color: AppTheme.warning, fontWeight: FontWeight.w600)),
+              ...expiringSoon.map((d) => Text('  • ${d['type'] ?? ''} (${d['dateExpiration'] ?? ''})', style: const TextStyle(fontSize: 13, color: AppTheme.warning))),
+            ],
+            const Divider(),
+            Row(children: [
+              const Text('Autorisation: ', style: TextStyle(fontWeight: FontWeight.bold)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: expired.isEmpty && !blocked && !nonConforme ? AppTheme.success.withValues(alpha: 0.1) : AppTheme.danger.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  expired.isEmpty && !blocked && !nonConforme ? 'DÉPART AUTORISÉ' : 'DÉPART BLOQUÉ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: expired.isEmpty && !blocked && !nonConforme ? AppTheme.success : AppTheme.danger,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ]),
+          ]),
+          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Fermer'))],
+        ),
+      );
+    } catch (_) {}
+  }
+
+  Widget _departRow(String label, bool ok, String detail) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(children: [
+        Icon(ok ? Icons.check_circle : Icons.cancel, size: 18, color: ok ? AppTheme.success : AppTheme.danger),
+        const SizedBox(width: 8),
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 13))),
+        Text(detail, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: ok ? AppTheme.success : AppTheme.danger)),
+      ]),
+    );
   }
 }
 
@@ -661,22 +969,35 @@ class _QrScannerScreen extends StatefulWidget {
 
 class _QrScannerScreenState extends State<_QrScannerScreen> {
   CameraController? _camera;
-  final QrCodeService _qrSvc = QrCodeService();
-  final VehicleService _vehicleSvc = VehicleService();
+  BarcodeScanner? _barcodeScanner;
+  final ScanCodeService _scanSvc = ScanCodeService();
   bool _processing = false;
   bool _camReady = false;
-  Timer? _scanTimer;
+  String? _camError;
+
+  Timer? _focusTimer;
+
+  InputImageRotation _rotation = InputImageRotation.rotation0deg;
+  String? _lastCode;
+  DateTime? _lastDecodeAt;
+  DateTime _lastFrameAt = DateTime.fromMillisecondsSinceEpoch(0);
+
+  static const Duration _minFrameInterval = Duration(milliseconds: 200);
+  static const Duration _sameCodeCooldown = Duration(milliseconds: 1500);
 
   @override
   void initState() {
     super.initState();
+    _barcodeScanner = BarcodeScanner(formats: [BarcodeFormat.all]);
     _initCamera();
   }
 
   @override
   void dispose() {
-    _scanTimer?.cancel();
+    _focusTimer?.cancel();
+    _camera?.stopImageStream();
     _camera?.dispose();
+    _barcodeScanner?.close();
     super.dispose();
   }
 
@@ -687,110 +1008,213 @@ class _QrScannerScreenState extends State<_QrScannerScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Permission caméra requise'), backgroundColor: AppTheme.danger),
         );
+        setState(() => _camError = 'Permission caméra refusée. Autorisez la caméra dans les réglages.');
       }
       return;
     }
     List<CameraDescription> cameras;
-    try { cameras = await availableCameras(); } catch (_) { return; }
-    if (cameras.isEmpty) return;
-    final cam = CameraController(
-      cameras.firstWhere((c) => c.lensDirection == CameraLensDirection.back, orElse: () => cameras.first),
-      ResolutionPreset.medium,
+    try { cameras = await availableCameras(); } catch (e) { print('[SCAN] availableCameras ERR $e'); if (mounted) setState(() => _camError = 'Caméra introuvable ($e)'); return; }
+    if (cameras.isEmpty) { print('[SCAN] no cameras'); if (mounted) setState(() => _camError = 'Aucune caméra détectée sur cet appareil'); return; }
+
+    final orientation = MediaQuery.orientationOf(context);
+    final description = cameras.firstWhere(
+      (c) => c.lensDirection == CameraLensDirection.back,
+      orElse: () => cameras.first,
     );
-    _camera = cam;
-    try { await cam.initialize(); } catch (_) { return; }
+
+    // L'ouverture caméra peut échouer transitoirement sur certains appareils
+    // (trop tôt après le lancement) : on réessaie quelques fois.
+    CameraController? cam;
+    Object? lastErr;
+    for (var attempt = 1; attempt <= 5; attempt++) {
+      final c = CameraController(
+        description,
+        ResolutionPreset.veryHigh,
+        enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.yuv420,
+      );
+      _camera = c;
+      try {
+        await c.initialize();
+        lastErr = null;
+        cam = c;
+        break;
+      } catch (e) {
+        lastErr = e;
+        print('[SCAN] init essai $attempt ERR $e');
+        try { await c.dispose(); } catch (_) {}
+        _camera = null;
+        if (attempt < 5) await Future.delayed(const Duration(seconds: 2));
+      }
+    }
+    if (cam == null) {
+      if (mounted) setState(() => _camError = 'Impossible d\'ouvrir la caméra : $lastErr');
+      return;
+    }
+
+    try { await cam.setFocusMode(FocusMode.auto); } catch (_) {}
+    try { await cam.setExposureMode(ExposureMode.auto); } catch (_) {}
+
+    final sensor = description.sensorOrientation;
+    final device = orientation == Orientation.landscape ? 0 : 90;
+    _rotation = rotationFromDegrees((sensor - device + 360) % 360);
+
     if (!mounted) return;
-    setState(() => _camReady = true);
-    _scanTimer = Timer.periodic(const Duration(seconds: 2), (_) {
-      if (!_processing) _autoScan();
+    setState(() {
+      _camReady = true;
+      _camError = null;
+    });
+
+    // Analyse image : flux continu (NV21) → ML Kit.
+    try {
+      await cam.startImageStream(_onFrame);
+    } catch (e) {
+      print('[SCAN] startImageStream ERR $e');
+    }
+
+    // Refocus périodique pour les codes-barres 1D (sensibles au flou).
+    _focusTimer = Timer.periodic(const Duration(seconds: 3), (_) async {
+      final c = _camera;
+      if (c == null || !c.value.isInitialized) return;
+      try {
+        await c.setFocusMode(FocusMode.auto);
+      } catch (_) {}
     });
   }
 
-  Future<void> _autoScan() async {
-    if (_camera == null || !_camera!.value.isInitialized) return;
+  /// Traitement continu d'une image caméra (throttlé) pour détecter QR codes
+  /// et codes-barres 1D en temps réel.
+  Future<void> _onFrame(CameraImage image) async {
+    final scanner = _barcodeScanner;
+    final cam = _camera;
+    if (scanner == null || cam == null || !cam.value.isInitialized) return;
+    if (_processing) return;
+
+    final now = DateTime.now();
+    if (now.difference(_lastFrameAt) < _minFrameInterval) return;
+    _lastFrameAt = now;
+
     _processing = true;
     try {
-      final file = await _camera!.takePicture();
-      final inputImage = InputImage.fromFilePath(file.path);
-      try {
-        final barcodeScanner = BarcodeScanner();
-        final barcodes = await barcodeScanner.processImage(inputImage);
-        await barcodeScanner.close();
-        if (barcodes.isNotEmpty && mounted) {
-          _scanTimer?.cancel();
-          final code = barcodes.first.rawValue ?? '';
-          await _processCode(code);
-          return;
-        }
-      } finally {
-        File(file.path).delete();
+      final bytes = convertYuv420ToNv21(image);
+      if (bytes == null) return;
+
+      final barcodes = await scanner.processImage(
+        InputImage.fromBytes(
+          bytes: bytes,
+          metadata: InputImageMetadata(
+            size: Size(image.width.toDouble(), image.height.toDouble()),
+            rotation: _rotation,
+            format: InputImageFormat.nv21,
+            bytesPerRow: image.planes[0].bytesPerRow,
+          ),
+        ),
+      );
+
+      if (!mounted) return;
+
+      final valid = barcodes.where((b) => (b.rawValue ?? '').trim().isNotEmpty).toList();
+      if (valid.isNotEmpty) {
+        final code = valid.first.rawValue!.trim();
+        print('[SCAN] DETECTED format=${valid.first.format} code=$code total=${valid.length}');
+        final same = code == _lastCode;
+        final cooldown = _lastDecodeAt != null &&
+            now.difference(_lastDecodeAt!) < _sameCodeCooldown;
+        if (same && cooldown) return;
+
+        _lastCode = code;
+        _lastDecodeAt = now;
+        await _processCode(code);
+        return;
       }
-    } catch (_) {}
-    _processing = false;
+    } catch (e) {
+      print('[SCAN] ERR $e');
+      // Image illisible ou erreur MLKit : on continue la boucle.
+    } finally {
+      _processing = false;
+    }
   }
 
   Future<void> _processCode(String code) async {
     final trimmed = code.trim().toUpperCase();
     if (trimmed.isEmpty) {
       _processing = false;
-      _restartTimer();
       return;
     }
 
-    for (final variant in [trimmed, ..._immatVariants(trimmed)]) {
-      final r = await _qrSvc.scan(variant);
-      if (r != null && r['vehicule'] != null) {
-        final v = r['vehicule'] as Map<String, dynamic>;
-        if (mounted) Navigator.pop(context, {'id': v['id'], 'immatriculation': v['immatriculation']});
-        return;
-      }
-      final veh = await _vehicleSvc.getByImmat(variant);
-      if (veh != null && mounted) {
-        Navigator.pop(context, {'id': veh['id'], 'immatriculation': veh['immatriculation']});
-        return;
-      }
+    final result = await _scanSvc.resolve(trimmed);
+    if (result != null && mounted) {
+      Navigator.pop(context, {'id': result['id'], 'immatriculation': result['immatriculation']});
+      return;
     }
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Véhicule "$trimmed" introuvable'), backgroundColor: AppTheme.danger),
-      );
+    if (mounted) _showVehicleNotFound(trimmed);
+    _processing = false;
+  }
+
+  Future<void> _lookupAndReturn(String immat) async {
+    _processing = true;
+    try {
+      final result = await _scanSvc.resolve(immat);
+      if (result != null && mounted) {
+        Navigator.pop(context, {'id': result['id'], 'immatriculation': result['immatriculation']});
+        return;
+      }
+      if (mounted) _showVehicleNotFound(immat);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: $e'), backgroundColor: AppTheme.danger),
+        );
+      }
     }
     _processing = false;
-    _restartTimer();
   }
 
-  void _restartTimer() {
-    _scanTimer = Timer.periodic(const Duration(seconds: 2), (_) {
-      if (!_processing) _autoScan();
-    });
-  }
-
-  List<String> _immatVariants(String raw) {
-    final variants = <String>{};
-    final clean = raw.replaceAll(RegExp(r'[^A-Z0-9]'), '');
-    if (clean != raw) variants.add(clean);
-    if (clean.length == 7) {
-      variants.add('${clean.substring(0, 2)}-${clean.substring(2, 5)}-${clean.substring(5)}');
-    }
-    if (clean.length == 6) {
-      variants.add('${clean.substring(0, 2)}-${clean.substring(2, 4)}-${clean.substring(4)}');
-    }
-    if (clean.length == 8) {
-      variants.add('${clean.substring(0, 2)}-${clean.substring(2, 6)}-${clean.substring(6)}');
-      variants.add('${clean.substring(0, 3)}-${clean.substring(3, 5)}-${clean.substring(5)}');
-    }
-    if (clean.length >= 9) {
-      variants.add('${clean.substring(0, 2)}-${clean.substring(2)}');
-    }
-    if (raw.contains('-')) variants.add(raw.replaceAll('-', ''));
-    return variants.toList();
+  /// Explique au chauffeur la cause réelle d'un code scanné / saisi qui ne
+  /// correspond à aucun véhicule enregistré.
+  void _showVehicleNotFound(String code) {
+    if (!mounted) return;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.search_off, color: AppTheme.warning, size: 36),
+        title: const Text('Véhicule introuvable'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Le code « $code » ne correspond à aucun véhicule enregistré dans l\'application.',
+              style: const TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Causes possibles :\n'
+              '• Le code lu est incorrect ou incomplet.\n'
+              '• Le véhicule n\'a pas encore été ajouté à la base.\n'
+              '• Le code correspond à un autre identifiant.',
+              style: TextStyle(fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Faites vérifier le code et l\'ajout du véhicule par votre administrateur '
+              '(Admin → Véhicules) avant de démarrer le check-up.',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Fermer')),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan QR code')),
+      appBar: AppBar(title: const Text('Scan véhicule')),
       body: _camReady && _camera != null
           ? Stack(
               children: [
@@ -806,7 +1230,7 @@ class _QrScannerScreenState extends State<_QrScannerScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        _processing ? 'Analyse...' : 'Scannez le QR code',
+                        _processing ? 'Analyse...' : 'Scannez QR code ou code-barres',
                         style: const TextStyle(color: Colors.white, fontSize: 14),
                       ),
                     ),
@@ -828,8 +1252,20 @@ class _QrScannerScreenState extends State<_QrScannerScreen> {
                 children: [
                   const Icon(Icons.camera_alt, size: 64, color: Colors.grey),
                   const SizedBox(height: 12),
-                  const Text('Caméra non disponible'),
-                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      _camError ?? 'Caméra non disponible',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton.icon(
+                    onPressed: _initCamera,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Réessayer'),
+                  ),
                   TextButton.icon(
                     onPressed: _showManualInput,
                     icon: const Icon(Icons.edit),
@@ -871,32 +1307,6 @@ class _QrScannerScreenState extends State<_QrScannerScreen> {
         ],
       ),
     );
-  }
-
-  Future<void> _lookupAndReturn(String immat) async {
-    _processing = true;
-    try {
-      for (final variant in [immat, ..._immatVariants(immat)]) {
-        final v = await _vehicleSvc.getByImmat(variant);
-        if (v != null && mounted) {
-          Navigator.pop(context, {'id': v['id'], 'immatriculation': v['immatriculation']});
-          return;
-        }
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Véhicule non trouvé'), backgroundColor: AppTheme.danger),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e'), backgroundColor: AppTheme.danger),
-        );
-      }
-    }
-    _processing = false;
-    _restartTimer();
   }
 }
 

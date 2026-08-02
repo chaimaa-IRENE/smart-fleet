@@ -114,7 +114,7 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
     }).toList();
 
     final enAttente = filtered.where((d) => d['statut'] == 'EN_ATTENTE').length;
-    final enCours = filtered.where((d) => ['PRISE_EN_CHARGE', 'EN_COURS'].contains(d['statut'])).length;
+    final enCours = filtered.where((d) => d['statut'] == 'EN_COURS').length;
     final enValidation = filtered.where((d) => d['statut'] == 'EN_VALIDATION').length;
     final traitees = filtered.where((d) => d['statut'] == 'TRAITE').length;
     final cloture = filtered.where((d) => d['statut'] == 'CLOTURE').length;
@@ -129,7 +129,7 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Tableau de bord Prestataire', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppTheme.textPrimary)),
               const SizedBox(height: 4),
-              Text('${filtered.length} déclarations', style: TextStyle(color: AppTheme.textSecondary)),
+              Text('${filtered.length} déclarations', style: TextStyle(color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
             ]),
           ),
           const SizedBox(height: 12),
@@ -172,28 +172,30 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
               const SizedBox(height: 6),
               Row(children: [
                 Expanded(child: DropdownButtonFormField<String>(
-                  value: _moisFilter.isEmpty ? null : _moisFilter,
-                  decoration: const InputDecoration(labelText: 'Mois', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
+                  initialValue: _moisFilter.isEmpty ? null : _moisFilter,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Mois', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 8), labelStyle: TextStyle(fontSize: 10), floatingLabelBehavior: FloatingLabelBehavior.never),
                   items: [
-                    const DropdownMenuItem(value: null, child: Text('Tous')),
+                    const DropdownMenuItem(value: null, child: Text('Tous', style: TextStyle(fontSize: 11))),
                     ...List.generate(12, (i) => DropdownMenuItem(
                       value: '${(i + 1).toString().padLeft(2, '0')}',
-                      child: Text(['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][i]),
+                      child: FittedBox(fit: BoxFit.scaleDown, child: Text(['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][i], style: const TextStyle(fontSize: 11))),
                     )),
                   ],
                   onChanged: (v) => setState(() => _moisFilter = v ?? ''),
                 )),
                 const SizedBox(width: 8),
                 Expanded(child: DropdownButtonFormField<String>(
-                  value: _categorieFilter.isEmpty ? null : _categorieFilter,
-                  decoration: const InputDecoration(labelText: 'Catégorie', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
+                  initialValue: _categorieFilter.isEmpty ? null : _categorieFilter,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Catégorie', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 8), labelStyle: TextStyle(fontSize: 10), floatingLabelBehavior: FloatingLabelBehavior.never),
                   items: [
-                    const DropdownMenuItem(value: null, child: Text('Tous')),
-                    const DropdownMenuItem(value: 'Maintenance', child: Text('Maintenance')),
-                    const DropdownMenuItem(value: 'Panne', child: Text('Panne')),
-                    const DropdownMenuItem(value: 'Accident', child: Text('Accident')),
-                    const DropdownMenuItem(value: 'Usure normale', child: Text('Usure normale')),
-                    const DropdownMenuItem(value: 'Autre', child: Text('Autre')),
+                    const DropdownMenuItem(value: null, child: Text('Tous', style: TextStyle(fontSize: 11))),
+                    const DropdownMenuItem(value: 'Maintenance', child: Text('Maintenance', style: TextStyle(fontSize: 11))),
+                    const DropdownMenuItem(value: 'Panne', child: Text('Panne', style: TextStyle(fontSize: 11))),
+                    const DropdownMenuItem(value: 'Accident', child: Text('Accident', style: TextStyle(fontSize: 11))),
+                    const DropdownMenuItem(value: 'Usure normale', child: FittedBox(fit: BoxFit.scaleDown, child: Text('Usure normale', style: TextStyle(fontSize: 11)))),
+                    const DropdownMenuItem(value: 'Autre', child: Text('Autre', style: TextStyle(fontSize: 11))),
                   ],
                   onChanged: (v) => setState(() => _categorieFilter = v ?? ''),
                 )),
@@ -303,7 +305,8 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
     final declPrestataireId = d['prestataireId'] as int?;
     final motifRejet = d['motifRejet'] as String?;
     final nm = d['numeroDemande'] as String? ?? '#$id';
-    final canAct = statut == 'EN_ATTENTE' || (declPrestataireId != null && declPrestataireId == prestataireId);
+    final isOwned = declPrestataireId != null && declPrestataireId == prestataireId;
+    final canAct = statut == 'EN_ATTENTE' || isOwned;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -313,8 +316,8 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
           child: Icon(_typeIcon(typePanne), color: AppColors.statusColor(statut), size: 20)),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('$immat - ${_typeLabel(typePanne)}', style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : AppTheme.textPrimary)),
-          Text('$nm  •  ${date.length >= 10 ? date.substring(0, 10) : date}', style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+          Text('$immat - ${_typeLabel(typePanne)}', style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : AppTheme.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text('$nm  •  ${date.length >= 10 ? date.substring(0, 10) : date}', style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
         ])),
         StatusBadge(status: statut),
       ]),
@@ -322,18 +325,18 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
         Padding(padding: const EdgeInsets.only(top: 6), child: Row(children: [
           Icon(Icons.flag, size: 14, color: d['criticite'] == 'BLOQUANT' ? AppTheme.danger : AppTheme.warning),
           const SizedBox(width: 4),
-          Text(d['criticite'] as String, style: TextStyle(fontSize: 11, color: d['criticite'] == 'BLOQUANT' ? AppTheme.danger : AppTheme.warning)),
+          Text(d['criticite'] as String, style: TextStyle(fontSize: 11, color: d['criticite'] == 'BLOQUANT' ? AppTheme.danger : AppTheme.warning), maxLines: 1, overflow: TextOverflow.ellipsis),
           if (d['kilometrage'] != null) ...[
             const SizedBox(width: 12),
             Icon(Icons.speed, size: 14, color: AppTheme.textSecondary),
             const SizedBox(width: 4),
-            Text('${d['kilometrage']} km', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+            Text('${d['kilometrage']} km', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
           if (d['lieu'] != null) ...[
             const SizedBox(width: 12),
             Icon(Icons.location_on, size: 14, color: AppTheme.textSecondary),
             const SizedBox(width: 4),
-            Text('${d['lieu']}', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+            Text('${d['lieu']}', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
         ])),
       if (d['description'] != null && (d['description'] as String).isNotEmpty)
@@ -347,25 +350,26 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
         Padding(padding: const EdgeInsets.only(top: 4), child: Row(children: [
           Icon(Icons.calendar_today, size: 12, color: AppTheme.textSecondary),
           const SizedBox(width: 4),
-          Text('Réparation: ${d['dateReparation']}', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+          Text('Réparation: ${d['dateReparation']}', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
         ])),
       if (d['dureeReparation'] != null)
         Padding(padding: const EdgeInsets.only(top: 2), child: Row(children: [
           Icon(Icons.timer, size: 12, color: AppTheme.textSecondary),
           const SizedBox(width: 4),
-          Text('Durée: ${d['dureeReparation']}', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+          Text('Durée: ${d['dureeReparation']}', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
         ])),
       if (d['etat'] != null)
         Padding(padding: const EdgeInsets.only(top: 2), child: Row(children: [
           Icon(Icons.info_outline, size: 12, color: AppTheme.primary),
           const SizedBox(width: 4),
-          Text('État: ${d['etat']}', style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.w500)),
+          Text('État: ${d['etat']}', style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis),
         ])),
-      if (d['cout'] != null)
+      if (d['cout'] != null || d['coutReel'] != null)
         Padding(padding: const EdgeInsets.only(top: 2), child: Row(children: [
           Icon(Icons.attach_money, size: 12, color: AppTheme.success),
           const SizedBox(width: 4),
-          Text('Coût: ${d['cout']} MAD', style: const TextStyle(fontSize: 11, color: AppTheme.success, fontWeight: FontWeight.w500)),
+          Text('Coût: ${d['coutReel'] ?? d['cout']} ${d['devise'] as String? ?? 'MAD'}',
+            style: const TextStyle(fontSize: 11, color: AppTheme.success, fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis),
         ])),
       if (statut == 'CLOTURE' || statut == 'RETOURNEE')
         Padding(padding: const EdgeInsets.only(top: 4), child: Container(
@@ -426,7 +430,7 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
           children: [
             Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)))),
             const SizedBox(height: 16),
-            Text('Déclaration ${d['numeroDemande'] ?? d['id']}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Déclaration ${d['numeroDemande'] ?? d['id']}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 16),
             _detailSection('Informations générales', [
               _detailRow('N° Demande', d['numeroDemande'] ?? '-'),
@@ -498,8 +502,8 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(width: 120, child: Text('$label:', style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary))),
-        Expanded(child: Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500))),
+        SizedBox(width: 120, child: Text('$label:', style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis)),
+        Expanded(child: Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500), maxLines: 2, overflow: TextOverflow.ellipsis)),
       ]),
     );
   }
@@ -507,14 +511,16 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
   List<Widget> _buildActions(DeclarationProvider prov, Map<String, dynamic> d, int id, String statut, int? prestataireId, String prestataireNom) {
     switch (statut) {
       case 'EN_ATTENTE':
-        return [_actionBtn('Prendre en charge', Icons.pan_tool, AppTheme.primary, () => prov.takeCharge(id, prestataireId!, prestataireNom))];
+        return [_actionBtn('Prendre en charge', Icons.pan_tool, AppTheme.primary, () {
+          prov.takeCharge(id, prestataireId!, prestataireNom).then((ok) {
+            if (!ok && mounted) _showError(prov.error ?? 'Échec prise en charge');
+          });
+        })];
       case 'PRISE_EN_CHARGE':
-        return [_actionBtn('Commencer', Icons.play_arrow, AppTheme.success, () => prov.markAsInProgress(id))];
       case 'EN_COURS':
         return [_actionBtn('Rapport', Icons.edit_note, AppTheme.primary, () => _openInterventionForm(id, d))];
       case 'EN_VALIDATION':
         return [
-          _actionBtn('Valider', Icons.check, AppTheme.success, () => prov.markAsProcessed(id)),
           _outlineBtn('Retourner', Icons.undo, () => _showReturnDialog(prov, id)),
         ];
       case 'TRAITE':
@@ -556,12 +562,17 @@ class _PrestataireDashboardState extends State<PrestataireDashboard> {
     if (result == true) await prov.returnDeclaration(id, motifController.text.trim());
   }
 
+  void _showError(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: AppTheme.danger));
+  }
+
   Future<void> _showCloseDialog(DeclarationProvider prov, int id) async {
     final coutController = TextEditingController();
     final result = await showDialog<bool>(context: context, builder: (ctx) => AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: const Text('Clôturer la déclaration'),
-      content: TextField(controller: coutController, decoration: InputDecoration(labelText: 'Coût réel (optionnel)', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), suffixText: '€'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+      content: TextField(controller: coutController, decoration: InputDecoration(labelText: 'Coût réel (optionnel)', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
       actions: [TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Annuler')), ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Clôturer'))],
     ));
     if (result == true) {

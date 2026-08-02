@@ -1,0 +1,4 @@
+"ID","AGENCE","ANNEE","ARCHIVED","ARCHIVED_AT","ARCHIVED_BY","BLOQUE_PAR","BRANCH_CODE","CARBURANT","CHAUFFEUR_ID","CHAUFFEUR_NOM","CONFORME","DATE_AFFECTATION","DATE_BLOCAGE","DATE_DEBLOCAGE","DEBLOQUE_PAR","DERNIERE_LATITUDE","DERNIERE_LONGITUDE","DERNIERE_POSITION_DATE","DERNIERE_VITESSE","DOCUMENTS_DISPONIBLES","GEOTAB_ID","IMMATRICULATION","KILOMETRAGE","MARQUE","MODELE","MOTEUR_ALLUME","NIVEAU_CARBURANT","NOTES","RAISON_BLOCAGE","STATUT","TOURNEE","TRUCK_NUMBER","TYPE","VEHICLE_ID"
+"1","","2020","FALSE","","","","","","3","","TRUE","","","","","","","","","","","AA-123-BC","45000","Renault","Master","FALSE","","","","ACTIF","","","",""
+"2","","2021","FALSE","","","","","","3","","TRUE","","","","","","","","","","","BB-456-CD","32000","Mercedes","Sprinter","FALSE","","","","ACTIF","","","",""
+"3","","2019","FALSE","","","","","","","","TRUE","","","","","","","","","","","CC-789-EF","58000","Iveco","Daily","FALSE","","","","ACTIF","","","",""

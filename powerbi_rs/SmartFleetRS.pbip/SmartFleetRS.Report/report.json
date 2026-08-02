@@ -1,0 +1,1340 @@
+{
+  "name": "SmartFleetRS.Report",
+  "datasetId": null,
+  "datasetReference": {
+    "byPath": {
+      "path": "../SmartFleetRS.SemanticModel"
+    }
+  },
+  "resourcePackages": [
+    {
+      "resourcePackage": {
+        "disabled": false,
+        "items": [
+          {
+            "name": "Default",
+            "type": "theme",
+            "path": "Default.json"
+          }
+        ]
+      }
+    }
+  ],
+  "sections": [
+    {
+      "name": "ReportSection",
+      "displayName": "Declarations",
+      "filters": "",
+      "layout": {
+        "layout": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1280,
+          "height": 720,
+          "tabOrder": 0,
+          "visualContainers": [
+            {
+              "x": 20,
+              "y": 8,
+              "width": 1240,
+              "height": 24,
+              "z": 1,
+              "tabOrder": 0,
+              "config": "{\"name\":\"TxtPage1Titre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"RESPONSABLE SUPPORT - DECLARATIONS\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 36,
+              "width": 300,
+              "height": 20,
+              "z": 2,
+              "tabOrder": 1,
+              "config": "{\"name\":\"TxtBudgetTitre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"BUDGET TRIMESTRIEL\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 58,
+              "width": 190,
+              "height": 78,
+              "z": 3,
+              "tabOrder": 2,
+              "config": "{\"name\":\"CardBudgetTotal\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Budget Total\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Budget Total\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#EFF6FF\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Budget Total])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 220,
+              "y": 58,
+              "width": 190,
+              "height": 78,
+              "z": 4,
+              "tabOrder": 3,
+              "config": "{\"name\":\"CardBudgetUtilise\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Budget Utilise\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Budget Utilise\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FFF7ED\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Budget Utilise])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 420,
+              "y": 58,
+              "width": 190,
+              "height": 78,
+              "z": 5,
+              "tabOrder": 4,
+              "config": "{\"name\":\"CardBudgetRestant\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Budget Restant\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Budget Restant\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#F0FDF4\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Budget Restant])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 640,
+              "y": 58,
+              "width": 340,
+              "height": 78,
+              "z": 6,
+              "tabOrder": 5,
+              "config": "{\"name\":\"BarBudget\",\"layout\":{},\"singleVisual\":{\"visualType\":\"stackedColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"BudgetTrimestriel.PERIODE_LABEL\",\"active\":true}],\"Values\":[{\"queryRef\":\"Measure.Budget Utilise\",\"active\":true},{\"queryRef\":\"Measure.Budget Restant\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Budget vs Reel\"}}},\"legend\":{\"properties\":{\"show\":true,\"position\":2}},\"general\":{\"properties\":{\"stacked\":true}},\"dataPoints\":[{\"properties\":{\"series\":{\"value\":\"Budget Utilise\"},\"fill\":{\"solid\":{\"color\":\"#3b82f6\"}}}},{\"properties\":{\"series\":{\"value\":\"Budget Restant\"},\"fill\":{\"solid\":{\"color\":\"#e2e8f0\"}}}}],\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('BudgetTrimestriel'[PERIODE_LABEL], \\\"Budget Utilise\\\",[Budget Utilise],\\\"Budget Restant\\\",[Budget Restant])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 150,
+              "width": 320,
+              "height": 220,
+              "z": 7,
+              "tabOrder": 6,
+              "config": "{\"name\":\"DonutRepartition\",\"layout\":{},\"singleVisual\":{\"visualType\":\"donutChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.PIE_SEGMENT\",\"active\":true}],\"Values\":[{\"queryRef\":\"Declarations.Nb Declarations\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Répartition des déclarations\"}}},\"legend\":{\"properties\":{\"show\":true,\"position\":3}},\"dataLabels\":{\"properties\":{\"show\":true}},\"dataPoints\":[{\"properties\":{\"category\":{\"value\":\"En attente\"},\"fill\":{\"solid\":{\"color\":\"#f59e0b\"}}}},{\"properties\":{\"category\":{\"value\":\"En cours\"},\"fill\":{\"solid\":{\"color\":\"#3b82f6\"}}}},{\"properties\":{\"category\":{\"value\":\"En validation\"},\"fill\":{\"solid\":{\"color\":\"#8b5cf6\"}}}},{\"properties\":{\"category\":{\"value\":\"Cloturees\"},\"fill\":{\"solid\":{\"color\":\"#10b981\"}}}},{\"properties\":{\"category\":{\"value\":\"Retournees\"},\"fill\":{\"solid\":{\"color\":\"#ef4444\"}}}}],\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[PIE_SEGMENT],\\\"Nb Declarations\\\",COUNTROWS('Declarations'))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 350,
+              "y": 150,
+              "width": 125,
+              "height": 100,
+              "z": 8,
+              "tabOrder": 7,
+              "config": "{\"name\":\"CardStatTotal\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Nb Declarations\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Total\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#F1F5F9\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Nb Declarations])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 480,
+              "y": 150,
+              "width": 125,
+              "height": 100,
+              "z": 9,
+              "tabOrder": 8,
+              "config": "{\"name\":\"CardStatEnAttente\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.En attente\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"En attente\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEF3C7\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[En attente])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 610,
+              "y": 150,
+              "width": 125,
+              "height": 100,
+              "z": 10,
+              "tabOrder": 9,
+              "config": "{\"name\":\"CardStatEnCours\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.En cours\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"En cours\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#DBEAFE\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[En cours])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 740,
+              "y": 150,
+              "width": 125,
+              "height": 100,
+              "z": 11,
+              "tabOrder": 10,
+              "config": "{\"name\":\"CardStatEnValidation\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.En validation\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"En validation\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#EDE9FE\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[En validation])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 870,
+              "y": 150,
+              "width": 125,
+              "height": 100,
+              "z": 12,
+              "tabOrder": 11,
+              "config": "{\"name\":\"CardStatCloturees\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Cloturees\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Cloturees\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#D1FAE5\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Cloturees])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 1000,
+              "y": 150,
+              "width": 125,
+              "height": 100,
+              "z": 13,
+              "tabOrder": 12,
+              "config": "{\"name\":\"CardStatRetournees\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Retournees\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Retournees\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEE2E2\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Retournees])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 290,
+              "width": 200,
+              "height": 110,
+              "z": 14,
+              "tabOrder": 13,
+              "config": "{\"name\":\"SlicerStatut\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.STATUT_LABEL\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Statut\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[STATUT_LABEL])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 228,
+              "y": 290,
+              "width": 240,
+              "height": 110,
+              "z": 16,
+              "tabOrder": 15,
+              "config": "{\"name\":\"SlicerTypePanne\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.TYPE_PANNE_FILTRE_LABEL\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Type panne\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[TYPE_PANNE_FILTRE_LABEL])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 476,
+              "y": 290,
+              "width": 220,
+              "height": 110,
+              "z": 17,
+              "tabOrder": 16,
+              "config": "{\"name\":\"SlicerImmatriculation\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.VEHICULE_IMMATRICULATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Immatriculation\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[VEHICULE_IMMATRICULATION])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 704,
+              "y": 290,
+              "width": 560,
+              "height": 110,
+              "z": 18,
+              "tabOrder": 17,
+              "config": "{\"name\":\"SlicerDate\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.DATE_HEURE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Date\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[DATE_HEURE])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 420,
+              "width": 1240,
+              "height": 290,
+              "z": 19,
+              "tabOrder": 18,
+              "config": "{\"name\":\"TableDeclarations\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Declarations.NUMERO_DEMANDE\",\"active\":true},{\"queryRef\":\"Declarations.DATE_HEURE\",\"active\":true},{\"queryRef\":\"Declarations.TYPE_PANNE_FRANCAIS\",\"active\":true},{\"queryRef\":\"Declarations.CRITICITE\",\"active\":true},{\"queryRef\":\"Declarations.STATUT_LABEL\",\"active\":true},{\"queryRef\":\"Declarations.CHAUFFEUR_NOM\",\"active\":true},{\"queryRef\":\"Declarations.VEHICULE_IMMATRICULATION\",\"active\":true},{\"queryRef\":\"Declarations.SOURCE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Declarations\"}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('Declarations','Declarations'[NUMERO_DEMANDE],'Declarations'[DATE_HEURE],'Declarations'[TYPE_PANNE_FRANCAIS],'Declarations'[CRITICITE],'Declarations'[STATUT_LABEL],'Declarations'[CHAUFFEUR_NOM],'Declarations'[VEHICULE_IMMATRICULATION],'Declarations'[SOURCE]))\",\"filters\":\"\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ReportSection2",
+      "displayName": "Checklists",
+      "filters": "",
+      "layout": {
+        "layout": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1280,
+          "height": 720,
+          "tabOrder": 1,
+          "visualContainers": [
+            {
+              "x": 20,
+              "y": 8,
+              "width": 1240,
+              "height": 24,
+              "z": 1,
+              "tabOrder": 0,
+              "config": "{\"name\":\"TxtPage2Titre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"CHECKLISTS - CHECK-UP CHAUFFEUR\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 36,
+              "width": 280,
+              "height": 80,
+              "z": 2,
+              "tabOrder": 1,
+              "config": "{\"name\":\"CardNbChecklists\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Nb Checklists\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Check-ups\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#EFF6FF\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Nb Checklists])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 320,
+              "y": 36,
+              "width": 280,
+              "height": 80,
+              "z": 3,
+              "tabOrder": 2,
+              "config": "{\"name\":\"CardPending\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.En attente de validation (PENDING)\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"En attente de validation\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEF3C7\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[En attente de validation (PENDING)])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 620,
+              "y": 36,
+              "width": 280,
+              "height": 80,
+              "z": 4,
+              "tabOrder": 3,
+              "config": "{\"name\":\"CardRepaire\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Reparations a valider (REPAIRE)\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Reparations a valider\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#EDE9FE\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Reparations a valider (REPAIRE)])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 920,
+              "y": 36,
+              "width": 280,
+              "height": 80,
+              "z": 5,
+              "tabOrder": 4,
+              "config": "{\"name\":\"CardNonConformes\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Non conformes (COMPLETE + non conforme)\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Non conformes\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEE2E2\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Non conformes (COMPLETE + non conforme)])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 140,
+              "width": 1240,
+              "height": 260,
+              "z": 6,
+              "tabOrder": 5,
+              "config": "{\"name\":\"TableChecklists\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Checklists.VEHICULE_IMMATRICULATION\",\"active\":true},{\"queryRef\":\"Checklists.CHAUFFEUR_NOM\",\"active\":true},{\"queryRef\":\"Checklists.DATE_CHECKLIST\",\"active\":true},{\"queryRef\":\"Checklists.STATUT\",\"active\":true},{\"queryRef\":\"Checklists.CONFORME_LABEL\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Checklists\"}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('Checklists','Checklists'[VEHICULE_IMMATRICULATION],'Checklists'[CHAUFFEUR_NOM],'Checklists'[DATE_CHECKLIST],'Checklists'[STATUT],'Checklists'[CONFORME_LABEL]))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 420,
+              "width": 1240,
+              "height": 24,
+              "z": 7,
+              "tabOrder": 6,
+              "config": "{\"name\":\"TxtPage2Pending\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"CHECK-UPS EN ATTENTE DE VALIDATION RS\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 448,
+              "width": 1240,
+              "height": 260,
+              "z": 8,
+              "tabOrder": 7,
+              "config": "{\"name\":\"TablePending\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Checklists.VEHICULE_IMMATRICULATION\",\"active\":true},{\"queryRef\":\"Checklists.CHAUFFEUR_NOM\",\"active\":true},{\"queryRef\":\"Checklists.DATE_CHECKLIST\",\"active\":true},{\"queryRef\":\"Checklists.CONFORME_LABEL\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Check-ups PENDING\"}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('Checklists','Checklists'[VEHICULE_IMMATRICULATION],'Checklists'[CHAUFFEUR_NOM],'Checklists'[DATE_CHECKLIST],'Checklists'[CONFORME_LABEL]))\",\"filters\":\"{\\\"$schema\\\":\\\"http://powerbi.com/product/schema#basic\\\",\\\"target\\\":{\\\"table\\\":\\\"Checklists\\\",\\\"column\\\":\\\"STATUT\\\"},\\\"filterType\\\":1,\\\"operator\\\":\\\"In\\\",\\\"values\\\":[\\\"PENDING\\\"]}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ReportSection3",
+      "displayName": "Documents RS",
+      "filters": "",
+      "layout": {
+        "layout": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1280,
+          "height": 720,
+          "tabOrder": 2,
+          "visualContainers": [
+            {
+              "x": 20,
+              "y": 8,
+              "width": 1240,
+              "height": 24,
+              "z": 1,
+              "tabOrder": 0,
+              "config": "{\"name\":\"TxtPage3Titre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"DOCUMENTS - RESPONSABLE SUPPORT\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 36,
+              "width": 236,
+              "height": 84,
+              "z": 2,
+              "tabOrder": 1,
+              "config": "{\"name\":\"CardTotalDocs\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Nb Documents\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Total documents\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#EFF6FF\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Nb Documents])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 271,
+              "y": 36,
+              "width": 236,
+              "height": 84,
+              "z": 3,
+              "tabOrder": 2,
+              "config": "{\"name\":\"CardValides\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Valides\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Valides\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#D1FAE5\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Valides])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 522,
+              "y": 36,
+              "width": 236,
+              "height": 84,
+              "z": 4,
+              "tabOrder": 3,
+              "config": "{\"name\":\"CardExpireBientot\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Expire bientot\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Expire bientot\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEF3C7\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Expire bientot])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 773,
+              "y": 36,
+              "width": 236,
+              "height": 84,
+              "z": 5,
+              "tabOrder": 4,
+              "config": "{\"name\":\"CardExpires\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Expires\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Expires\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEE2E2\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Expires])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 1024,
+              "y": 36,
+              "width": 236,
+              "height": 84,
+              "z": 6,
+              "tabOrder": 5,
+              "config": "{\"name\":\"CardManquants\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Manquants\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Manquants\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#F1F5F9\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Manquants])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 140,
+              "width": 280,
+              "height": 110,
+              "z": 7,
+              "tabOrder": 6,
+              "config": "{\"name\":\"SlicerTypeDocument\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"DocumentsVehicule.TYPE_DOCUMENT_LABEL\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Type document\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('DocumentsVehicule'[TYPE_DOCUMENT_LABEL])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 308,
+              "y": 140,
+              "width": 240,
+              "height": 110,
+              "z": 8,
+              "tabOrder": 7,
+              "config": "{\"name\":\"SlicerStatutDoc\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"DocumentsVehicule.STATUT_DOCUMENT_LABEL\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Statut\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('DocumentsVehicule'[STATUT_DOCUMENT_LABEL])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 556,
+              "y": 140,
+              "width": 260,
+              "height": 110,
+              "z": 9,
+              "tabOrder": 8,
+              "config": "{\"name\":\"SlicerVehiculeDoc\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"DocumentsVehicule.VEHICULE_IMMATRICULATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Vehicule\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('DocumentsVehicule'[VEHICULE_IMMATRICULATION])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 270,
+              "width": 1240,
+              "height": 200,
+              "z": 10,
+              "tabOrder": 9,
+              "config": "{\"name\":\"TableDocuments\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"DocumentsVehicule.VEHICULE_IMMATRICULATION\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.TYPE_DOCUMENT_LABEL\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.NUMERO_DOCUMENT\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.DATE_EMISSION\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.DATE_EXPIRATION\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.JOURS_RESTANTS\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.STATUT_DOCUMENT_LABEL\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Documents\"}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('DocumentsVehicule','DocumentsVehicule'[VEHICULE_IMMATRICULATION],'DocumentsVehicule'[TYPE_DOCUMENT_LABEL],'DocumentsVehicule'[NUMERO_DOCUMENT],'DocumentsVehicule'[DATE_EMISSION],'DocumentsVehicule'[DATE_EXPIRATION],'DocumentsVehicule'[JOURS_RESTANTS],'DocumentsVehicule'[STATUT_DOCUMENT_LABEL]))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 490,
+              "width": 1240,
+              "height": 24,
+              "z": 11,
+              "tabOrder": 10,
+              "config": "{\"name\":\"TxtPage3Notifs\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"NOTIFICATIONS - EXPIRATION IMMINENTE (<= 30 JOURS)\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 518,
+              "width": 1240,
+              "height": 190,
+              "z": 12,
+              "tabOrder": 11,
+              "config": "{\"name\":\"TableNotifs\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"DocumentsVehicule.VEHICULE_IMMATRICULATION\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.TYPE_DOCUMENT_LABEL\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.DATE_EXPIRATION\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.JOURS_RESTANTS\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.STATUT_DOCUMENT_LABEL\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Notifications\"}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('DocumentsVehicule','DocumentsVehicule'[VEHICULE_IMMATRICULATION],'DocumentsVehicule'[TYPE_DOCUMENT_LABEL],'DocumentsVehicule'[DATE_EXPIRATION],'DocumentsVehicule'[JOURS_RESTANTS],'DocumentsVehicule'[STATUT_DOCUMENT_LABEL]))\",\"filters\":\"{\\\"$schema\\\":\\\"http://powerbi.com/product/schema#basic\\\",\\\"target\\\":{\\\"table\\\":\\\"DocumentsVehicule\\\",\\\"column\\\":\\\"STATUT_DOCUMENT\\\"},\\\"filterType\\\":1,\\\"operator\\\":\\\"In\\\",\\\"values\\\":[\\\"EXPIRE_BIENTOT\\\"]}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ReportSection4",
+      "displayName": "Historique Vehicule",
+      "filters": "",
+      "layout": {
+        "layout": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1280,
+          "height": 720,
+          "tabOrder": 3,
+          "visualContainers": [
+            {
+              "x": 20,
+              "y": 8,
+              "width": 1240,
+              "height": 24,
+              "z": 1,
+              "tabOrder": 0,
+              "config": "{\"name\":\"TxtPage4Titre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"HISTORIQUE VEHICULE\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 40,
+              "width": 280,
+              "height": 120,
+              "z": 2,
+              "tabOrder": 1,
+              "config": "{\"name\":\"SlicerVehiculeHist\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.IMMATRICULATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Vehicule\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 320,
+              "y": 40,
+              "width": 180,
+              "height": 96,
+              "z": 3,
+              "tabOrder": 2,
+              "config": "{\"name\":\"CardCheckupsHist\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Nb Checklists\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Check-ups\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#EFF6FF\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Nb Checklists])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 514,
+              "y": 40,
+              "width": 180,
+              "height": 96,
+              "z": 4,
+              "tabOrder": 3,
+              "config": "{\"name\":\"CardAnomaliesHist\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Nb Anomalies\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Anomalies\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEF3C7\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Nb Anomalies])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 708,
+              "y": 40,
+              "width": 180,
+              "height": 96,
+              "z": 5,
+              "tabOrder": 4,
+              "config": "{\"name\":\"CardDocsHist\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Nb Documents\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Documents\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#D1FAE5\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Nb Documents])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 180,
+              "width": 600,
+              "height": 20,
+              "z": 6,
+              "tabOrder": 5,
+              "config": "{\"name\":\"TxtPage4Docs\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"DOCUMENTS REGLEMENTAIRES PAR TYPE\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 202,
+              "width": 600,
+              "height": 190,
+              "z": 8,
+              "tabOrder": 7,
+              "config": "{\"name\":\"TableDocsParType\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"DocumentsVehicule.TYPE_DOCUMENT_LABEL\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.STATUT_DOCUMENT_LABEL\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.NUMERO_DOCUMENT\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.DATE_EXPIRATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('DocumentsVehicule','DocumentsVehicule'[TYPE_DOCUMENT_LABEL],'DocumentsVehicule'[STATUT_DOCUMENT_LABEL],'DocumentsVehicule'[NUMERO_DOCUMENT],'DocumentsVehicule'[DATE_EXPIRATION]))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 640,
+              "y": 180,
+              "width": 620,
+              "height": 20,
+              "z": 9,
+              "tabOrder": 8,
+              "config": "{\"name\":\"TxtPage4Blocages\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"BLOCAGES\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 640,
+              "y": 202,
+              "width": 620,
+              "height": 190,
+              "z": 10,
+              "tabOrder": 9,
+              "config": "{\"name\":\"TableBlocages\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"VehicleBlocking.BLOCAGE_LABEL\",\"active\":true},{\"queryRef\":\"VehicleBlocking.RAISON\",\"active\":true},{\"queryRef\":\"VehicleBlocking.DATE_BLOCAGE\",\"active\":true},{\"queryRef\":\"VehicleBlocking.DATE_DEBLOCAGE\",\"active\":true},{\"queryRef\":\"VehicleBlocking.BLOQUE_PAR\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('VehicleBlocking','VehicleBlocking'[BLOCAGE_LABEL],'VehicleBlocking'[RAISON],'VehicleBlocking'[DATE_BLOCAGE],'VehicleBlocking'[DATE_DEBLOCAGE],'VehicleBlocking'[BLOQUE_PAR]))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 412,
+              "width": 600,
+              "height": 20,
+              "z": 11,
+              "tabOrder": 10,
+              "config": "{\"name\":\"TxtPage4Checkups\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"CHECK-UPS\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 434,
+              "width": 600,
+              "height": 130,
+              "z": 12,
+              "tabOrder": 11,
+              "config": "{\"name\":\"TableCheckupsHist\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Checklists.DATE_CHECKLIST\",\"active\":true},{\"queryRef\":\"Checklists.STATUT\",\"active\":true},{\"queryRef\":\"Checklists.CONFORME_LABEL\",\"active\":true},{\"queryRef\":\"Checklists.CHAUFFEUR_NOM\",\"active\":true},{\"queryRef\":\"Checklists.TOURNEE_ID\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('Checklists','Checklists'[DATE_CHECKLIST],'Checklists'[STATUT],'Checklists'[CONFORME_LABEL],'Checklists'[CHAUFFEUR_NOM],'Checklists'[TOURNEE_ID]))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 640,
+              "y": 412,
+              "width": 620,
+              "height": 20,
+              "z": 13,
+              "tabOrder": 12,
+              "config": "{\"name\":\"TxtPage4Anomalies\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"ANOMALIES\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 640,
+              "y": 434,
+              "width": 620,
+              "height": 130,
+              "z": 14,
+              "tabOrder": 13,
+              "config": "{\"name\":\"TableAnomaliesHist\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"AnomaliesCheckup.STATUT_LABEL\",\"active\":true},{\"queryRef\":\"AnomaliesCheckup.ELEMENT\",\"active\":true},{\"queryRef\":\"AnomaliesCheckup.DESCRIPTION\",\"active\":true},{\"queryRef\":\"AnomaliesCheckup.DATE_DETECTION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('AnomaliesCheckup','AnomaliesCheckup'[STATUT_LABEL],'AnomaliesCheckup'[ELEMENT],'AnomaliesCheckup'[DESCRIPTION],'AnomaliesCheckup'[DATE_DETECTION]))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 584,
+              "width": 600,
+              "height": 20,
+              "z": 15,
+              "tabOrder": 14,
+              "config": "{\"name\":\"TxtPage4Departs\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"DEPARTS\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 606,
+              "width": 600,
+              "height": 110,
+              "z": 16,
+              "tabOrder": 15,
+              "config": "{\"name\":\"TableDeparts\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"DepartHistorique.RESULTAT_CONTROLE\",\"active\":true},{\"queryRef\":\"DepartHistorique.NUMERO_DEPART\",\"active\":true},{\"queryRef\":\"DepartHistorique.DATE_DEPART\",\"active\":true},{\"queryRef\":\"DepartHistorique.CHAUFFEUR_NOM\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('DepartHistorique','DepartHistorique'[RESULTAT_CONTROLE],'DepartHistorique'[NUMERO_DEPART],'DepartHistorique'[DATE_DEPART],'DepartHistorique'[CHAUFFEUR_NOM]))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 640,
+              "y": 584,
+              "width": 620,
+              "height": 20,
+              "z": 17,
+              "tabOrder": 16,
+              "config": "{\"name\":\"TxtPage4Tournees\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"TOURNEES\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 640,
+              "y": 606,
+              "width": 620,
+              "height": 110,
+              "z": 18,
+              "tabOrder": 17,
+              "config": "{\"name\":\"TableTournees\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Tournees.STATUT\",\"active\":true},{\"queryRef\":\"Tournees.NUMERO_TOURNEE\",\"active\":true},{\"queryRef\":\"Tournees.DATE_TOURNEE\",\"active\":true},{\"queryRef\":\"Tournees.SITE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('Tournees','Tournees'[STATUT],'Tournees'[NUMERO_TOURNEE],'Tournees'[DATE_TOURNEE],'Tournees'[SITE]))\",\"filters\":\"\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ReportSection5",
+      "displayName": "Power BI",
+      "filters": "",
+      "objects": {
+        "pageBackground": {
+          "properties": {
+            "background": {
+              "solid": {
+                "color": "#0F172A"
+              }
+            },
+            "transparency": 0
+          }
+        }
+      },
+      "layout": {
+        "layout": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1280,
+          "height": 800,
+          "tabOrder": 4,
+          "visualContainers": [
+            {
+              "x": 20,
+              "y": 8,
+              "width": 1240,
+              "height": 24,
+              "z": 1,
+              "tabOrder": 0,
+              "config": "{\"name\":\"TxtPage5Titre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"POWER BI - RESPONSABLE SUPPORT\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 36,
+              "width": 196,
+              "height": 40,
+              "z": 2,
+              "tabOrder": 1,
+              "config": "{\"name\":\"SlicerPeriode\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.PERIODE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Période\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[PERIODE])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 228,
+              "y": 36,
+              "width": 196,
+              "height": 40,
+              "z": 3,
+              "tabOrder": 2,
+              "config": "{\"name\":\"SlicerSite\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.AGENCE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Tous sites\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[AGENCE])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 436,
+              "y": 36,
+              "width": 196,
+              "height": 40,
+              "z": 4,
+              "tabOrder": 3,
+              "config": "{\"name\":\"SlicerVehicule5\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.IMMATRICULATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Tous véhicules\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 644,
+              "y": 36,
+              "width": 196,
+              "height": 40,
+              "z": 5,
+              "tabOrder": 4,
+              "config": "{\"name\":\"SlicerChauffeur\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Utilisateurs.NAME\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Tous chauffeurs\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Utilisateurs'[NAME])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 852,
+              "y": 36,
+              "width": 196,
+              "height": 40,
+              "z": 6,
+              "tabOrder": 5,
+              "config": "{\"name\":\"SlicerStatut5\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.STATUT\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Tous statuts\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[STATUT])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 1060,
+              "y": 36,
+              "width": 196,
+              "height": 40,
+              "z": 7,
+              "tabOrder": 6,
+              "config": "{\"name\":\"SlicerCriticite\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.CRITICITE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Toutes criticites\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[CRITICITE])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 80,
+              "width": 196,
+              "height": 40,
+              "z": 8,
+              "tabOrder": 7,
+              "config": "{\"name\":\"SlicerTypePanne5\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.TYPE_PANNE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Tous types panne\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[TYPE_PANNE])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 228,
+              "y": 80,
+              "width": 196,
+              "height": 40,
+              "z": 9,
+              "tabOrder": 8,
+              "config": "{\"name\":\"SlicerRegion\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.REGION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Toutes régions\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[REGION])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 436,
+              "y": 80,
+              "width": 196,
+              "height": 40,
+              "z": 10,
+              "tabOrder": 9,
+              "config": "{\"name\":\"SlicerPrestataire\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.PRESTATAIRE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Aucun prestataire\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[PRESTATAIRE])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 644,
+              "y": 80,
+              "width": 196,
+              "height": 40,
+              "z": 11,
+              "tabOrder": 10,
+              "config": "{\"name\":\"SlicerVille\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Utilisateurs.VILLE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Toutes villes\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Utilisateurs'[VILLE])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 852,
+              "y": 80,
+              "width": 196,
+              "height": 40,
+              "z": 12,
+              "tabOrder": 11,
+              "config": "{\"name\":\"SlicerAnnee\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.ANNEE_DECLARATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Toutes années\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[ANNEE_DECLARATION])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 1060,
+              "y": 80,
+              "width": 196,
+              "height": 40,
+              "z": 13,
+              "tabOrder": 12,
+              "config": "{\"name\":\"SlicerMois\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.MOIS_DECLARATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Tous mois\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[MOIS_DECLARATION])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 132,
+              "width": 155,
+              "height": 80,
+              "z": 14,
+              "tabOrder": 13,
+              "config": "{\"name\":\"Card5TotalVehicules\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Total Vehicules\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Total Véhicules\"},\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"labels\":{\"properties\":{\"show\":true,\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Total Vehicules])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 175,
+              "y": 132,
+              "width": 155,
+              "height": 80,
+              "z": 15,
+              "tabOrder": 14,
+              "config": "{\"name\":\"Card5EnService\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.En Service\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"En Service\"},\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"labels\":{\"properties\":{\"show\":true,\"fontColor\":{\"solid\":{\"color\":\"#10B981\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[En Service])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 330,
+              "y": 132,
+              "width": 155,
+              "height": 80,
+              "z": 16,
+              "tabOrder": 15,
+              "config": "{\"name\":\"Card5Arret\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.A l Arret\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"À l'Arrêt\"},\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"labels\":{\"properties\":{\"show\":true,\"fontColor\":{\"solid\":{\"color\":\"#F472B6\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[A l Arret])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 485,
+              "y": 132,
+              "width": 155,
+              "height": 80,
+              "z": 17,
+              "tabOrder": 16,
+              "config": "{\"name\":\"Card5Maintenance\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.En Maintenance\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"En Maintenance\"},\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"labels\":{\"properties\":{\"show\":true,\"fontColor\":{\"solid\":{\"color\":\"#FBBF24\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[En Maintenance])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 640,
+              "y": 132,
+              "width": 155,
+              "height": 80,
+              "z": 18,
+              "tabOrder": 17,
+              "config": "{\"name\":\"Card5AnomaliesOuvertes\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Anomalies ouvertes\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Anomalies Ouvertes\"},\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"labels\":{\"properties\":{\"show\":true,\"fontColor\":{\"solid\":{\"color\":\"#F87171\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Anomalies ouvertes])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 795,
+              "y": 132,
+              "width": 155,
+              "height": 80,
+              "z": 19,
+              "tabOrder": 18,
+              "config": "{\"name\":\"Card5Checkups30j\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Check-ups 30 jours\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Check-ups (30j)\"},\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"labels\":{\"properties\":{\"show\":true,\"fontColor\":{\"solid\":{\"color\":\"#A78BFA\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Check-ups 30 jours])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 950,
+              "y": 132,
+              "width": 155,
+              "height": 80,
+              "z": 20,
+              "tabOrder": 19,
+              "config": "{\"name\":\"Card5KmTotal\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Kilometrage Total\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Kilométrage Total\"},\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"labels\":{\"properties\":{\"show\":true,\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Kilometrage Total])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 1105,
+              "y": 132,
+              "width": 155,
+              "height": 80,
+              "z": 21,
+              "tabOrder": 20,
+              "config": "{\"name\":\"Card5TauxUtil\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Taux Utilisation\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Taux Utilisation\"},\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"labels\":{\"properties\":{\"show\":true,\"fontColor\":{\"solid\":{\"color\":\"#38BDF8\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Taux Utilisation])\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 280,
+              "width": 240,
+              "height": 200,
+              "z": 22,
+              "tabOrder": 21,
+              "config": "{\"name\":\"Donut5StatutVehicules\",\"layout\":{},\"singleVisual\":{\"visualType\":\"donutChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.STATUT_LABEL\",\"active\":true}],\"Values\":[{\"queryRef\":\"Measure.Total Vehicules\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Répartition véhicules par statut\"},\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"legend\":{\"properties\":{\"show\":true,\"position\":3,\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"dataLabels\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"background\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"dataPoints\":[{\"properties\":{\"category\":{\"value\":\"En Service\"},\"fill\":{\"solid\":{\"color\":\"#10b981\"}}}},{\"properties\":{\"category\":{\"value\":\"À l'Arrêt\"},\"fill\":{\"solid\":{\"color\":\"#f472b6\"}}}},{\"properties\":{\"category\":{\"value\":\"Maintenance\"},\"fill\":{\"solid\":{\"color\":\"#f59e0b\"}}}},{\"properties\":{\"category\":{\"value\":\"Bloqués\"},\"fill\":{\"solid\":{\"color\":\"#64748b\"}}}}],\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[STATUT_LABEL],\\\"Total Vehicules\\\",COUNTROWS('Vehicules'))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 268,
+              "y": 280,
+              "width": 240,
+              "height": 200,
+              "z": 23,
+              "tabOrder": 22,
+              "config": "{\"name\":\"Donut5Source\",\"layout\":{},\"singleVisual\":{\"visualType\":\"donutChart\",\"projections\":{\"Category\":[{\"queryRef\":\"AnomaliesCheckup.SOURCE\",\"active\":true}],\"Values\":[{\"queryRef\":\"Measure.Nb Anomalies\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Repartition anomalies par source\"},\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"legend\":{\"properties\":{\"show\":true,\"position\":3,\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"dataLabels\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"background\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[SOURCE],\\\"Nb Anomalies\\\",COUNTROWS('AnomaliesCheckup'))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 516,
+              "y": 280,
+              "width": 240,
+              "height": 200,
+              "z": 24,
+              "tabOrder": 23,
+              "config": "{\"name\":\"Bar5TypesIncident\",\"layout\":{},\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.TYPE_PANNE_FILTRE_LABEL\",\"active\":true}],\"Values\":[{\"queryRef\":\"Measure.Nb Declarations\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Types d'incident\"},\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"legend\":{\"properties\":{\"show\":false}},\"xAxis\":{\"properties\":{\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"yAxis\":{\"properties\":{\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"background\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[TYPE_PANNE_FILTRE_LABEL],\\\"Nb Declarations\\\",COUNTROWS('Declarations'))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 764,
+              "y": 280,
+              "width": 240,
+              "height": 200,
+              "z": 25,
+              "tabOrder": 24,
+              "config": "{\"name\":\"Bar5Marque\",\"layout\":{},\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.MARQUE\",\"active\":true}],\"Values\":[{\"queryRef\":\"Measure.Total Vehicules\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Repartition par marque\"},\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"legend\":{\"properties\":{\"show\":false}},\"xAxis\":{\"properties\":{\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"yAxis\":{\"properties\":{\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"background\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[MARQUE],\\\"Total Vehicules\\\",COUNTROWS('Vehicules'))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 1012,
+              "y": 280,
+              "width": 248,
+              "height": 200,
+              "z": 26,
+              "tabOrder": 25,
+              "config": "{\"name\":\"Bar5DocsParType\",\"layout\":{},\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"DocumentsVehicule.TYPE_DOCUMENT_LABEL\",\"active\":true}],\"Values\":[{\"queryRef\":\"Measure.Nb Documents\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Documents par type\"},\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"legend\":{\"properties\":{\"show\":false}},\"xAxis\":{\"properties\":{\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"yAxis\":{\"properties\":{\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"background\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('DocumentsVehicule'[TYPE_DOCUMENT_LABEL],\\\"Nb Documents\\\",COUNTROWS('DocumentsVehicule'))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 20,
+              "y": 500,
+              "width": 300,
+              "height": 160,
+              "z": 27,
+              "tabOrder": 26,
+              "config": "{\"name\":\"Donut5Qualification\",\"layout\":{},\"singleVisual\":{\"visualType\":\"donutChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.QUALIFICATION\",\"active\":true}],\"Values\":[{\"queryRef\":\"Measure.Nb Declarations\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Qualification\"},\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"legend\":{\"properties\":{\"show\":true,\"position\":3,\"fontColor\":{\"solid\":{\"color\":\"#94A3B8\"}}}},\"dataLabels\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"background\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[QUALIFICATION],\\\"Nb Declarations\\\",COUNTROWS('Declarations'))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 340,
+              "y": 500,
+              "width": 500,
+              "height": 200,
+              "z": 28,
+              "tabOrder": 27,
+              "config": "{\"name\":\"Table5ApercuVehicules\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Vehicules.IMMATRICULATION\",\"active\":true},{\"queryRef\":\"Vehicules.STATUT\",\"active\":true},{\"queryRef\":\"Vehicules.MARQUE\",\"active\":true},{\"queryRef\":\"Vehicules.MODELE\",\"active\":true},{\"queryRef\":\"Vehicules.CHAUFFEUR_NOM\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Apercu vehicules\"},\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"background\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('Vehicules','Vehicules'[IMMATRICULATION],'Vehicules'[STATUT],'Vehicules'[MARQUE],'Vehicules'[MODELE],'Vehicules'[CHAUFFEUR_NOM]))\",\"filters\":\"\"}"
+            },
+            {
+              "x": 860,
+              "y": 500,
+              "width": 400,
+              "height": 200,
+              "z": 29,
+              "tabOrder": 28,
+              "config": "{\"name\":\"Table5Alertes\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"DocumentsVehicule.TYPE_DOCUMENT_LABEL\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.STATUT_DOCUMENT_LABEL\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.VEHICULE_IMMATRICULATION\",\"active\":true},{\"queryRef\":\"DocumentsVehicule.DATE_EXPIRATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Alertes actives\"},\"fontColor\":{\"solid\":{\"color\":\"#FFFFFF\"}}}},\"background\":{\"properties\":{\"show\":true,\"color\":{\"solid\":{\"color\":\"#0A1628\"}}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('DocumentsVehicule','DocumentsVehicule'[TYPE_DOCUMENT_LABEL],'DocumentsVehicule'[STATUT_DOCUMENT_LABEL],'DocumentsVehicule'[VEHICULE_IMMATRICULATION],'DocumentsVehicule'[DATE_EXPIRATION]))\",\"filters\":\"{\\\"$schema\\\":\\\"http://powerbi.com/product/schema#basic\\\",\\\"target\\\":{\\\"table\\\":\\\"DocumentsVehicule\\\",\\\"column\\\":\\\"STATUT_DOCUMENT\\\"},\\\"filterType\\\":1,\\\"operator\\\":\\\"In\\\",\\\"values\\\":[\\\"EXPIRE\\\",\\\"MANQUANT\\\"]}\"}"
+            },
+            {
+              "x": 20,
+              "y": 720,
+              "width": 1240,
+              "height": 40,
+              "z": 30,
+              "tabOrder": 29,
+              "config": "{\"name\":\"TxtPage5Note\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"Conformité web RS : filtres, cartes, graphiques et colonnes conformes au module web. Données absentes de l'export H2 (indisponibles dans le web) : IVMS, consommation, vitesse moyenne, SLA, interventions prestataires, analyses IA, budget par mois — visuels correspondants non reproduits. Recherche libre \"Rechercher\" et boutons d'action (Cloturer/Retourner/Budget/Prendre en charge) non reproductibles dans Power BI. Le filtre \"Tous statuts\" porte sur le statut véhicule (comme le web).\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ReportSection6",
+      "displayName": "Vue d'ensemble",
+      "filters": "",
+      "layout": {
+        "layout": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1280,
+          "height": 720,
+          "tabOrder": 5,
+          "visualContainers": [
+            {
+              "x": 20,
+              "y": 8,
+              "width": 980,
+              "height": 16,
+              "z": 1,
+              "tabOrder": 0,
+              "config": "{\"name\":\"TxtP6Titre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"VUE D'ENSEMBLE - SMART FLEET\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}",
+              "query": "",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 40,
+              "width": 200,
+              "height": 120,
+              "z": 2,
+              "tabOrder": 1,
+              "config": "{\"name\":\"CardP6Conformite\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Conformite Vehicules\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Conformité\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#EFF6FF\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Conformite Vehicules])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE ROW(\"Value\",[Conformite Vehicules])",
+              "filters": ""
+            },
+            {
+              "x": 240,
+              "y": 40,
+              "width": 200,
+              "height": 120,
+              "z": 3,
+              "tabOrder": 2,
+              "config": "{\"name\":\"CardP6Conso\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Conso Estimee (L/100km)\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Consommation (L/100km)\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#F0FDF4\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Conso Estimee (L/100km)])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE ROW(\"Value\",[Conso Estimee (L/100km)])",
+              "filters": ""
+            },
+            {
+              "x": 460,
+              "y": 40,
+              "width": 200,
+              "height": 120,
+              "z": 4,
+              "tabOrder": 3,
+              "config": "{\"name\":\"CardP6Score\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Score Conduite\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Score conduite\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEF3C7\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Score Conduite])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE ROW(\"Value\",[Score Conduite])",
+              "filters": ""
+            },
+            {
+              "x": 680,
+              "y": 40,
+              "width": 200,
+              "height": 120,
+              "z": 5,
+              "tabOrder": 4,
+              "config": "{\"name\":\"CardP6Alertes\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Anomalies critiques\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Alertes critiques\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEE2E2\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Anomalies critiques])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE ROW(\"Value\",[Anomalies critiques])",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 180,
+              "width": 300,
+              "height": 300,
+              "z": 6,
+              "tabOrder": 5,
+              "config": "{\"name\":\"PieP6Anomalies\",\"layout\":{},\"singleVisual\":{\"visualType\":\"donutChart\",\"projections\":{\"Category\":[{\"queryRef\":\"AnomaliesCheckup.CATEGORIE\",\"active\":true}],\"Values\":[{\"queryRef\":\"AnomaliesCheckup.Nb Anomalies\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Répartition anomalies par catégorie\"}}},\"legend\":{\"properties\":{\"show\":true,\"position\":3}},\"dataLabels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CATEGORIE],\\\"Nb Anomalies\\\",COUNTROWS('AnomaliesCheckup'))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CATEGORIE],\"Nb Anomalies\",COUNTROWS('AnomaliesCheckup'))",
+              "filters": ""
+            },
+            {
+              "x": 340,
+              "y": 180,
+              "width": 660,
+              "height": 300,
+              "z": 7,
+              "tabOrder": 6,
+              "config": "{\"name\":\"LineP6Km\",\"layout\":{},\"singleVisual\":{\"visualType\":\"lineChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.DATE_HEURE\",\"active\":true}],\"Values\":[{\"queryRef\":\"Declarations.KILOMETRAGE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Kilométrage dans le temps\"}}},\"legend\":{\"properties\":{\"show\":false}},\"xAxis\":{\"properties\":{\"show\":true}},\"yAxis\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[DATE_HEURE],\\\"KILOMETRAGE\\\",SUM('Declarations'[KILOMETRAGE]))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[DATE_HEURE],\"KILOMETRAGE\",SUM('Declarations'[KILOMETRAGE]))",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 500,
+              "width": 980,
+              "height": 200,
+              "z": 8,
+              "tabOrder": 7,
+              "config": "{\"name\":\"TableP6Declarations\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Declarations.NUMERO_DEMANDE\",\"active\":true},{\"queryRef\":\"Declarations.DATE_HEURE\",\"active\":true},{\"queryRef\":\"Declarations.VEHICULE_IMMATRICULATION\",\"active\":true},{\"queryRef\":\"Declarations.TYPE_PANNE_FRANCAIS\",\"active\":true},{\"queryRef\":\"Declarations.CRITICITE\",\"active\":true},{\"queryRef\":\"Declarations.STATUT_LABEL\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Dernières déclarations\"}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('Declarations','Declarations'[NUMERO_DEMANDE],'Declarations'[DATE_HEURE],'Declarations'[VEHICULE_IMMATRICULATION],'Declarations'[TYPE_PANNE_FRANCAIS],'Declarations'[CRITICITE],'Declarations'[STATUT_LABEL]))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('Declarations','Declarations'[NUMERO_DEMANDE],'Declarations'[DATE_HEURE],'Declarations'[VEHICULE_IMMATRICULATION],'Declarations'[TYPE_PANNE_FRANCAIS],'Declarations'[CRITICITE],'Declarations'[STATUT_LABEL]))",
+              "filters": ""
+            },
+            {
+              "x": 1020,
+              "y": 40,
+              "width": 240,
+              "height": 90,
+              "z": 9,
+              "tabOrder": 8,
+              "config": "{\"name\":\"SlicerP6Date\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.DATE_HEURE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Date\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[DATE_HEURE])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[DATE_HEURE])",
+              "filters": ""
+            },
+            {
+              "x": 1020,
+              "y": 150,
+              "width": 240,
+              "height": 90,
+              "z": 10,
+              "tabOrder": 9,
+              "config": "{\"name\":\"SlicerP6Chauffeur\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.CHAUFFEUR_NOM\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Chauffeur\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[CHAUFFEUR_NOM])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[CHAUFFEUR_NOM])",
+              "filters": ""
+            },
+            {
+              "x": 1020,
+              "y": 260,
+              "width": 240,
+              "height": 90,
+              "z": 11,
+              "tabOrder": 10,
+              "config": "{\"name\":\"SlicerP6Vehicule\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.IMMATRICULATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Véhicule\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION])",
+              "filters": ""
+            },
+            {
+              "x": 1020,
+              "y": 370,
+              "width": 240,
+              "height": 90,
+              "z": 12,
+              "tabOrder": 11,
+              "config": "{\"name\":\"SlicerP6Categorie\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"AnomaliesCheckup.CATEGORIE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Catégorie\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CATEGORIE])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CATEGORIE])",
+              "filters": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ReportSection7",
+      "displayName": "Performance vehicule",
+      "filters": "",
+      "layout": {
+        "layout": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1280,
+          "height": 720,
+          "tabOrder": 6,
+          "visualContainers": [
+            {
+              "x": 20,
+              "y": 8,
+              "width": 880,
+              "height": 16,
+              "z": 1,
+              "tabOrder": 0,
+              "config": "{\"name\":\"TxtP7Titre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"PERFORMANCE VÉHICULE\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}",
+              "query": "",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 36,
+              "width": 880,
+              "height": 320,
+              "z": 2,
+              "tabOrder": 1,
+              "config": "{\"name\":\"LineP7KmQuotidien\",\"layout\":{},\"singleVisual\":{\"visualType\":\"lineChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.DATE_HEURE\",\"active\":true}],\"Values\":[{\"queryRef\":\"Declarations.KILOMETRAGE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Kilométrage journalier\"}}},\"legend\":{\"properties\":{\"show\":false}},\"xAxis\":{\"properties\":{\"show\":true}},\"yAxis\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[DATE_HEURE],\\\"KILOMETRAGE\\\",SUM('Declarations'[KILOMETRAGE]))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[DATE_HEURE],\"KILOMETRAGE\",SUM('Declarations'[KILOMETRAGE]))",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 376,
+              "width": 430,
+              "height": 320,
+              "z": 3,
+              "tabOrder": 2,
+              "config": "{\"name\":\"BarP7Ralenti\",\"layout\":{},\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.IMMATRICULATION\",\"active\":true}],\"Values\":[{\"queryRef\":\"Measure.% Ralenti\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Ralenti par véhicule (%)\"}}},\"legend\":{\"properties\":{\"show\":false}},\"xAxis\":{\"properties\":{\"show\":true}},\"yAxis\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION],\\\"% Ralenti\\\",[% Ralenti])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION],\"% Ralenti\",[% Ralenti])",
+              "filters": ""
+            },
+            {
+              "x": 470,
+              "y": 376,
+              "width": 430,
+              "height": 320,
+              "z": 4,
+              "tabOrder": 3,
+              "config": "{\"name\":\"GaugeP7Conso\",\"layout\":{},\"singleVisual\":{\"visualType\":\"gauge\",\"projections\":{\"Target\":[{\"queryRef\":\"Measure.Objectif Conso\",\"active\":true}],\"Values\":[{\"queryRef\":\"Measure.Conso Estimee (L/100km)\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Consommation vs objectif\"}}},\"gauge\":{\"properties\":{}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Conso Estimee (L/100km)],\\\"Target\\\",[Objectif Conso])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE ROW(\"Value\",[Conso Estimee (L/100km)],\"Target\",[Objectif Conso])",
+              "filters": ""
+            },
+            {
+              "x": 920,
+              "y": 36,
+              "width": 340,
+              "height": 90,
+              "z": 5,
+              "tabOrder": 4,
+              "config": "{\"name\":\"SlicerP7Vehicule\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.IMMATRICULATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Véhicule\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION])",
+              "filters": ""
+            },
+            {
+              "x": 920,
+              "y": 146,
+              "width": 340,
+              "height": 90,
+              "z": 6,
+              "tabOrder": 5,
+              "config": "{\"name\":\"SlicerP7Chauffeur\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.CHAUFFEUR_NOM\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Chauffeur\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[CHAUFFEUR_NOM])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[CHAUFFEUR_NOM])",
+              "filters": ""
+            },
+            {
+              "x": 920,
+              "y": 256,
+              "width": 340,
+              "height": 90,
+              "z": 7,
+              "tabOrder": 6,
+              "config": "{\"name\":\"SlicerP7Date\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Declarations.DATE_HEURE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Date\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[DATE_HEURE])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Declarations'[DATE_HEURE])",
+              "filters": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ReportSection8",
+      "displayName": "Anomalies & reparations",
+      "filters": "",
+      "layout": {
+        "layout": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1280,
+          "height": 720,
+          "tabOrder": 7,
+          "visualContainers": [
+            {
+              "x": 20,
+              "y": 8,
+              "width": 1240,
+              "height": 16,
+              "z": 1,
+              "tabOrder": 0,
+              "config": "{\"name\":\"TxtP8Titre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"ANOMALIES & RÉPARATIONS\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}",
+              "query": "",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 28,
+              "width": 200,
+              "height": 36,
+              "z": 2,
+              "tabOrder": 1,
+              "config": "{\"name\":\"SlicerP8Criticite\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"AnomaliesCheckup.CRITICITE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Criticité\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CRITICITE])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CRITICITE])",
+              "filters": ""
+            },
+            {
+              "x": 240,
+              "y": 28,
+              "width": 200,
+              "height": 36,
+              "z": 3,
+              "tabOrder": 2,
+              "config": "{\"name\":\"SlicerP8Categorie\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"AnomaliesCheckup.CATEGORIE\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Catégorie\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CATEGORIE])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CATEGORIE])",
+              "filters": ""
+            },
+            {
+              "x": 460,
+              "y": 28,
+              "width": 200,
+              "height": 36,
+              "z": 4,
+              "tabOrder": 3,
+              "config": "{\"name\":\"SlicerP8Vehicule\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.IMMATRICULATION\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Véhicule\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[IMMATRICULATION])",
+              "filters": ""
+            },
+            {
+              "x": 680,
+              "y": 28,
+              "width": 200,
+              "height": 36,
+              "z": 5,
+              "tabOrder": 4,
+              "config": "{\"name\":\"SlicerP8Chauffeur\",\"layout\":{},\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.CHAUFFEUR_NOM\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"orientation\":2,\"visualStyle\":2,\"filter\":{\"property\":{\"show\":true}}}},\"slicerHeader\":{\"properties\":{\"headerText\":{\"text\":\"Chauffeur\"}}},\"selection\":{\"properties\":{\"selectAll\":true,\"selectionMode\":1}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[CHAUFFEUR_NOM])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[CHAUFFEUR_NOM])",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 80,
+              "width": 820,
+              "height": 320,
+              "z": 6,
+              "tabOrder": 5,
+              "config": "{\"name\":\"TableP8Anomalies\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"AnomaliesCheckup.DATE_DETECTION\",\"active\":true},{\"queryRef\":\"AnomaliesCheckup.CATEGORIE\",\"active\":true},{\"queryRef\":\"AnomaliesCheckup.CRITICITE\",\"active\":true},{\"queryRef\":\"AnomaliesCheckup.DESCRIPTION\",\"active\":true},{\"queryRef\":\"AnomaliesCheckup.STATUT_LABEL\",\"active\":true},{\"queryRef\":\"AnomaliesCheckup.RESOLUTION_NOTES\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Anomalies & réparations\"}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('AnomaliesCheckup','AnomaliesCheckup'[DATE_DETECTION],'AnomaliesCheckup'[CATEGORIE],'AnomaliesCheckup'[CRITICITE],'AnomaliesCheckup'[DESCRIPTION],'AnomaliesCheckup'[STATUT_LABEL],'AnomaliesCheckup'[RESOLUTION_NOTES]))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE CALCULATETABLE(SUMMARIZE('AnomaliesCheckup','AnomaliesCheckup'[DATE_DETECTION],'AnomaliesCheckup'[CATEGORIE],'AnomaliesCheckup'[CRITICITE],'AnomaliesCheckup'[DESCRIPTION],'AnomaliesCheckup'[STATUT_LABEL],'AnomaliesCheckup'[RESOLUTION_NOTES]))",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 420,
+              "width": 820,
+              "height": 280,
+              "z": 7,
+              "tabOrder": 6,
+              "config": "{\"name\":\"BarP8Temps\",\"layout\":{},\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"AnomaliesCheckup.DATE_DETECTION\",\"active\":true}],\"Values\":[{\"queryRef\":\"AnomaliesCheckup.Nb Anomalies\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Anomalies dans le temps\"}}},\"legend\":{\"properties\":{\"show\":false}},\"xAxis\":{\"properties\":{\"show\":true}},\"yAxis\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[DATE_DETECTION],\\\"Nb Anomalies\\\",COUNTROWS('AnomaliesCheckup'))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[DATE_DETECTION],\"Nb Anomalies\",COUNTROWS('AnomaliesCheckup'))",
+              "filters": ""
+            },
+            {
+              "x": 860,
+              "y": 80,
+              "width": 400,
+              "height": 190,
+              "z": 8,
+              "tabOrder": 7,
+              "config": "{\"name\":\"PieP8Categorie\",\"layout\":{},\"singleVisual\":{\"visualType\":\"donutChart\",\"projections\":{\"Category\":[{\"queryRef\":\"AnomaliesCheckup.CATEGORIE\",\"active\":true}],\"Values\":[{\"queryRef\":\"AnomaliesCheckup.Nb Anomalies\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Par catégorie\"}}},\"legend\":{\"properties\":{\"show\":true,\"position\":3}},\"dataLabels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CATEGORIE],\\\"Nb Anomalies\\\",COUNTROWS('AnomaliesCheckup'))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CATEGORIE],\"Nb Anomalies\",COUNTROWS('AnomaliesCheckup'))",
+              "filters": ""
+            },
+            {
+              "x": 860,
+              "y": 290,
+              "width": 400,
+              "height": 190,
+              "z": 9,
+              "tabOrder": 8,
+              "config": "{\"name\":\"PieP8Marque\",\"layout\":{},\"singleVisual\":{\"visualType\":\"donutChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Vehicules.MARQUE\",\"active\":true}],\"Values\":[{\"queryRef\":\"AnomaliesCheckup.Nb Anomalies\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Par marque\"}}},\"legend\":{\"properties\":{\"show\":true,\"position\":3}},\"dataLabels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[MARQUE],\\\"Nb Anomalies\\\",COUNTROWS('AnomaliesCheckup'))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('Vehicules'[MARQUE],\"Nb Anomalies\",COUNTROWS('AnomaliesCheckup'))",
+              "filters": ""
+            },
+            {
+              "x": 860,
+              "y": 500,
+              "width": 400,
+              "height": 190,
+              "z": 10,
+              "tabOrder": 9,
+              "config": "{\"name\":\"PieP8Element\",\"layout\":{},\"singleVisual\":{\"visualType\":\"donutChart\",\"projections\":{\"Category\":[{\"queryRef\":\"AnomaliesCheckup.ELEMENT\",\"active\":true}],\"Values\":[{\"queryRef\":\"AnomaliesCheckup.Nb Anomalies\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Par élément\"}}},\"legend\":{\"properties\":{\"show\":true,\"position\":3}},\"dataLabels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[ELEMENT],\\\"Nb Anomalies\\\",COUNTROWS('AnomaliesCheckup'))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[ELEMENT],\"Nb Anomalies\",COUNTROWS('AnomaliesCheckup'))",
+              "filters": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ReportSection9",
+      "displayName": "Chauffeurs",
+      "filters": "",
+      "layout": {
+        "layout": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "width": 1280,
+          "height": 720,
+          "tabOrder": 8,
+          "visualContainers": [
+            {
+              "x": 20,
+              "y": 8,
+              "width": 760,
+              "height": 16,
+              "z": 1,
+              "tabOrder": 0,
+              "config": "{\"name\":\"TxtP9Titre\",\"layout\":{},\"singleVisual\":{\"visualType\":\"textbox\",\"prototypeQuery\":null,\"objects\":{\"general\":{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"text\":\"CHAUFFEURS - PERFORMANCE\"}]}]}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"\",\"filters\":\"\"}",
+              "query": "",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 36,
+              "width": 200,
+              "height": 120,
+              "z": 2,
+              "tabOrder": 1,
+              "config": "{\"name\":\"CardP9Score\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Score Conduite Chauffeur\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Score conduite\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEF3C7\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Score Conduite Chauffeur])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE ROW(\"Value\",[Score Conduite Chauffeur])",
+              "filters": ""
+            },
+            {
+              "x": 240,
+              "y": 36,
+              "width": 200,
+              "height": 120,
+              "z": 3,
+              "tabOrder": 2,
+              "config": "{\"name\":\"CardP9Chauffeurs\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Chauffeurs\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Chauffeurs\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#EFF6FF\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Chauffeurs])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE ROW(\"Value\",[Chauffeurs])",
+              "filters": ""
+            },
+            {
+              "x": 460,
+              "y": 36,
+              "width": 200,
+              "height": 120,
+              "z": 4,
+              "tabOrder": 3,
+              "config": "{\"name\":\"CardP9Ouvertes\",\"layout\":{},\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Measure.Anomalies ouvertes\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Anomalies ouvertes\"}}},\"card\":{\"properties\":{\"fill\":{\"solid\":{\"color\":\"#FEE2E2\"}}}},\"labels\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE ROW(\\\"Value\\\",[Anomalies ouvertes])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE ROW(\"Value\",[Anomalies ouvertes])",
+              "filters": ""
+            },
+            {
+              "x": 20,
+              "y": 176,
+              "width": 760,
+              "height": 520,
+              "z": 5,
+              "tabOrder": 4,
+              "config": "{\"name\":\"TableP9Chauffeurs\",\"layout\":{},\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"AnomaliesCheckup.CHAUFFEUR_NOM\",\"active\":true},{\"queryRef\":\"Measure.Nb Anomalies\",\"active\":true},{\"queryRef\":\"Measure.Anomalies critiques\",\"active\":true},{\"queryRef\":\"Measure.Anomalies ouvertes\",\"active\":true},{\"queryRef\":\"Measure.Score Conduite Chauffeur\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Anomalies par chauffeur\"}}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CHAUFFEUR_NOM],\\\"Nb Anomalies\\\",[Nb Anomalies],\\\"Anomalies critiques\\\",[Anomalies critiques],\\\"Anomalies ouvertes\\\",[Anomalies ouvertes],\\\"Score\\\",[Score Conduite Chauffeur])\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE SUMMARIZECOLUMNS('AnomaliesCheckup'[CHAUFFEUR_NOM],\"Nb Anomalies\",[Nb Anomalies],\"Anomalies critiques\",[Anomalies critiques],\"Anomalies ouvertes\",[Anomalies ouvertes],\"Score\",[Score Conduite Chauffeur])",
+              "filters": ""
+            },
+            {
+              "x": 800,
+              "y": 36,
+              "width": 460,
+              "height": 660,
+              "z": 6,
+              "tabOrder": 5,
+              "config": "{\"name\":\"BarP9Top5\",\"layout\":{},\"singleVisual\":{\"visualType\":\"clusteredColumnChart\",\"projections\":{\"Category\":[{\"queryRef\":\"AnomaliesCheckup.CHAUFFEUR_NOM\",\"active\":true}],\"Values\":[{\"queryRef\":\"AnomaliesCheckup.Nb Anomalies\",\"active\":true}]},\"prototypeQuery\":null,\"objects\":{\"title\":{\"properties\":{\"show\":true,\"text\":{\"text\":\"Top 5 chauffeurs (anomalies)\"}}},\"legend\":{\"properties\":{\"show\":false}},\"xAxis\":{\"properties\":{\"show\":true}},\"yAxis\":{\"properties\":{\"show\":true}},\"formattingModelSchema\":{\"version\":\"1.0\"}},\"drillFilters\":[],\"filters\":[]},\"query\":\"Query 0: EVALUATE TOPN(5,SUMMARIZECOLUMNS('AnomaliesCheckup'[CHAUFFEUR_NOM],\\\"Nb Anomalies\\\",COUNTROWS('AnomaliesCheckup')))\",\"filters\":\"\"}",
+              "query": "Query 0: EVALUATE TOPN(5,SUMMARIZECOLUMNS('AnomaliesCheckup'[CHAUFFEUR_NOM],\"Nb Anomalies\",COUNTROWS('AnomaliesCheckup')))",
+              "filters": ""
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

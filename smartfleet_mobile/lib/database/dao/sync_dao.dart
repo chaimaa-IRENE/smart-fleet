@@ -11,13 +11,14 @@ class SyncDao {
     Map<String, dynamic>? payload,
   }) async {
     final db = await _db.database;
-    await db.insert('sync_queue', {
+    final data = <String, dynamic>{
       'tableName': tableName,
       'action': action,
       'recordId': recordId,
-      'payload': payload != null ? jsonEncode(payload) : null,
+      'payload': payload != null ? jsonEncode(Map<String, dynamic>.from(payload)) : null,
       'status': 'PENDING',
-    });
+    };
+    await db.insert('sync_queue', data);
   }
 
   Future<List<Map<String, dynamic>>> getPending() async {

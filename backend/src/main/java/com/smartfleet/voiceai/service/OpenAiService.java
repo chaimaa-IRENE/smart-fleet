@@ -73,7 +73,7 @@ public class OpenAiService {
     private static final Map<String, List<String>> ELEMENT_PATTERNS = new LinkedHashMap<>();
     static {
         ELEMENT_PATTERNS.put("MOTEUR", List.of(
-            "موطور", "moteur", "محرك", "motor", "machine", "tourne",
+            "موطور", "ماطور", "moteur", "محرك", "motor", "machine", "tourne",
             "démarre", "kaydémarrer", "kaydar", "dokhan", "دخان", "fumée", "smoke",
             "tapping", "boulon", "رادياتير", "radiateur", "refroidissement",
             "kaytsen", "كاتسن", "t9atta", "تقطع"
@@ -127,7 +127,7 @@ public class OpenAiService {
     private static final Map<String, List<String>> PANNE_PATTERNS = new LinkedHashMap<>();
     static {
         PANNE_PATTERNS.put("MECANIQUE", List.of(
-            "موطور", "moteur", "محرك", "frein", "فران", "boite", "vitesse",
+            "موطور", "ماطور", "moteur", "محرك", "frein", "فران", "boite", "vitesse",
             "علبة", "embrayage", "clutch", "débrayage", "suspension", "amorti",
             "courroie", "distribution", "joint", "culasse", "t9atta",
             "رادياتير", "radiateur", "maye", "ماء", "zayt", "زيت"
@@ -478,6 +478,17 @@ public class OpenAiService {
                 if (hasLetter && digitCount >= 2) return clean.toUpperCase();
             }
         }
+        // Join adjacent tokens ("247 A", "A 247", "123 B"): combine and validate
+        for (int i = 0; i < words.length - 1; i++) {
+            String a = words[i].replaceAll("[^a-zA-Z0-9]", "");
+            String b = words[i + 1].replaceAll("[^a-zA-Z0-9]", "");
+            String combined = a + b;
+            if (combined.length() >= 4 && combined.length() <= 10) {
+                long digitCount = combined.chars().filter(Character::isDigit).count();
+                boolean hasLetter = combined.matches(".*[a-zA-Z].*");
+                if (hasLetter && digitCount >= 2) return combined.toUpperCase();
+            }
+        }
         return null;
     }
 
@@ -489,10 +500,18 @@ public class OpenAiService {
     }
 
     private String extractElement(String lower) {
+        String best = null;
+        int bestPos = -1;
         for (Map.Entry<String, List<String>> entry : ELEMENT_PATTERNS.entrySet()) {
-            if (matchesAny(lower, entry.getValue())) return entry.getKey();
+            for (String p : entry.getValue()) {
+                int idx = lower.lastIndexOf(p);
+                if (idx > bestPos) {
+                    bestPos = idx;
+                    best = entry.getKey();
+                }
+            }
         }
-        return null;
+        return best;
     }
 
     private String extractCriticite(String lower) {
@@ -695,6 +714,9 @@ public class OpenAiService {
         if (extract == null || extract.isEmpty()) {
             return "مشكل. شوف الرقم فالكارت ديال السيارة ولا فالسير. كاين غير فالشيخة ولا الضهر.";
         }
+        if (!extract.containsKey("typePanne") && !extract.containsKey("elementVehicule")) {
+            return "واش المشكل فالماطور، العجلات، الفرانات، ولا شي حاجة أخرى؟";
+        }
         if (!extract.containsKey("immatriculation")) {
             return "شوف رقم الشاحنة فالكارت ولا فاللوحة. راه كاين قدام ولا لور.";
         }
@@ -799,29 +821,25 @@ public class OpenAiService {
     }
 
     private String generateElementFollowUp(String element, Map<String, String> extract) {
-        if (!extract.containsKey("criticite")) {
-            switch (element) {
-                case "FREIN": return "واضح. المشكل فالفرانات. واش السيارة قادرة توقف ولا لا؟";
-                case "MOTEUR": return "واش الماطور كاين فیه دخان؟ واش كايدوي بزاف؟ واش كايطلع صوت غريب؟";
-                case "PNEU": return "واش العجلة مفرقعة بالكامل ولا باقي فيها الهوى؟ واش عندك عجلة احتياطية؟";
-                case "BATTERIE": return "واش السيارة كاتبدا ولا لا؟ واش كاين تيار فالكهرباء؟";
-                case "CAMERA": return "كاميرا دالمحور اللور ولا دالرجوع؟ واش التصوير كايخدم؟";
-                case "PHARE": return "الضو قدام ولا لور؟ واش واحد الاتنين ولا واحد فيهم؟";
-                case "PORTE": return "واش الباب كايتسد ولا باقي مخلوع؟ واش الزجاج كايخدم؟";
-                case "CARROSSERIE": return "واش الضربة كبيرة ولا صغيرة؟ واش كاين شي حاجة مكسورة؟";
-                case "SIEGE": return "الكرسي ديال السائق ولا ديال الشنطة؟ واش مخلوع ولا مكسور؟";
-                case "GPS": return "واش كايخدم GPS ولا لا؟ واش المشكل فالشاشة ولا فالاتصال؟";
-                case "CLIM": return "واش المكيف ما كايدويش ولا كايدوي وما كايبردش؟";
-                case "SUSPENSION": return "واش السيارة كاتطربق فالحفر؟ واش كاتحس بيه فالمقود؟";
-                case "ACCIDENT": return "واش كاين جريح؟ واش الحادس كبير ولا صغير؟ واش السيارة قادرة تمشي؟";
-                default: {
-                    String next = getNextNaturalQuestion(extract);
-                    return "واخا فهمت. " + next;
-                }
+        switch (element) {
+            case "FREIN": return "واضح. المشكل فالفرانات. واش السيارة قادرة توقف ولا لا؟";
+            case "MOTEUR": return "واش الماطور كاين فیه دخان؟ واش كايدوي بزاف؟ واش كايطلع صوت غريب؟";
+            case "PNEU": return "واش العجلة مفرقعة بالكامل ولا باقي فيها الهوى؟ واش عندك عجلة احتياطية؟";
+            case "BATTERIE": return "واش السيارة كاتبدا ولا لا؟ واش كاين تيار فالكهرباء؟";
+            case "CAMERA": return "كاميرا دالمحور اللور ولا دالرجوع؟ واش التصوير كايخدم؟";
+            case "PHARE": return "الضو قدام ولا لور؟ واش واحد الاتنين ولا واحد فيهم؟";
+            case "PORTE": return "واش الباب كايتسد ولا باقي مخلوع؟ واش الزجاج كايخدم؟";
+            case "CARROSSERIE": return "واش الضربة كبيرة ولا صغيرة؟ واش كاين شي حاجة مكسورة؟";
+            case "SIEGE": return "الكرسي ديال السائق ولا ديال الشنطة؟ واش مخلوع ولا مكسور؟";
+            case "GPS": return "واش كايخدم GPS ولا لا؟ واش المشكل فالشاشة ولا فالاتصال؟";
+            case "CLIM": return "واش المكيف ما كايدويش ولا كايدوي وما كايبردش؟";
+            case "SUSPENSION": return "واش السيارة كاتطربق فالحفر؟ واش كاتحس بيه فالمقود؟";
+            case "ACCIDENT": return "واش كاين جريح؟ واش الحادس كبير ولا صغير؟ واش السيارة قادرة تمشي؟";
+            default: {
+                String next = getNextNaturalQuestion(extract);
+                return "واخا فهمت. " + next;
             }
         }
-        String next = getNextNaturalQuestion(extract);
-        return "واخا. " + next;
     }
 
     private String handleCriticite(String msg, Map<String, String> extract) {

@@ -25,7 +25,7 @@
 | jean@smartfleet.fr | chauffeur123 | CHAUFFEUR |
 | presta@smartfleet.fr | presta123 | PRESTATAIRE |
 
-- **L'« Agent IA » (vocal) est optionnel** et nécessite un serveur (voir le guide technique).
+- **L'« Agent IA » (vocal) est optionnel.** Sa version complète nécessite les serveurs fournis (`backend/`), mais il se **dégrade automatiquement hors ligne** : reconnaissance vocale native + synthèse vocale intégrée du téléphone, agent conversationnel déterministe sans Internet (voir le guide technique, §8.9).
 
 ---
 
@@ -58,4 +58,14 @@ backend/               Serveur « Agent IA » (Spring Boot, port 8082)
                        + Serveur vocal TTS/STT (Python, port 5000)
 powerbi_rs/            Rapport Power BI (rôle RS)
 docs/                  Documentation : guides client, technique, captures d'écran
+scripts/               Tunnels adb (démonstration locale) : restore_tunnels.bat
+dist/                  APK de livraison : SmartFleet.apk
 ```
+
+## Mode online / offline de l'Agent IA vocal
+
+| Situation | Écoute (STT) | Agent IA | Voix (TTS) | Déclaration |
+|---|---|---|---|---|
+| En ligne | Serveur vocal (5000) | Backend (8082) | Serveur vocal (5000) | Locale + sync |
+| Téléphone branché au PC, sans Internet | STT natif (fallback) | Backend — déterministe sans OpenAI | Synthèse locale (fallback) | Locale + sync |
+| Téléphone seul | STT natif | ✗ message de connexion | Synthèse locale (fallback) | Locale + sync |

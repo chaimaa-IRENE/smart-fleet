@@ -69,6 +69,23 @@ Chaque scénario se termine par : ✅ **Résultat attendu :** *(ce que vous deve
 
 ### 2.4 Consulter les documents
 
+### 2.5 Tester l'Agent IA (vocal)
+
+> Le service vocal demande le serveur fourni (voir le guide technique). Même sans lui, l'application bascule sur la reconnaissance et la voix du téléphone.
+
+1. Toucher **« Agent IA »** (ou « Assistant vocal ») depuis l'accueil Chauffeur.
+2. Toucher **« Commencer la déclaration »** (ou le micro).
+3. Dire une phrase naturelle, ex. *« Plaque AA-123-BC, le moteur fume »* ou *« la batterie de la plaque 247 a est morte »*.
+4. ✅ **Résultat attendu :** l'agent répond en darija (textuellement et/ou à la voix), pose une question de suivi, puis propose de sauvegarder.
+5. Terminer la conversation jusqu'à la **confirmation**.
+6. ✅ **Résultat attendu :** un message de **succès** (« Déclaration enregistrée ») et la déclaration apparaît dans la liste **« Déclarations »**.
+
+**Test du mode hors ligne (si un serveur est utilisé) :**
+1. Désactiver **WiFi et données mobiles** sur le téléphone (le câble USB peut rester branché).
+2. Relancer une déclaration vocale.
+3. ✅ **Résultat attendu (téléphone branché au PC) :** l'agent répond encore (via le serveur local sur le câble USB), ou au minimum la voix/écoute locale fonctionne, et la déclaration est **sauvegardée dans le téléphone**.
+4. ✅ La déclaration hors ligne est envoyée **automatiquement** quand la connexion revient.
+
 1. Sur l'accueil, toucher **« Documents »**.
 2. ✅ **Résultat attendu :** les documents des véhicules (assurance, carte grise, visite technique) avec un statut couleur : 🟢 Valide / 🟡 Expire bientôt / 🔴 Expiré.
 
@@ -134,6 +151,17 @@ Chaque scénario se termine par : ✅ **Résultat attendu :** *(ce que vous deve
 3. ✅ **Résultat attendu :** 4 indicateurs (Total, Actifs, Inactifs, Chauffeurs) et la liste des utilisateurs avec recherche.
 4. **Modifier** un utilisateur (icône stylo) : le formulaire s'ouvre avec les sections Identité / Contact / Accès & Sécurité. Annuler sans enregistrer (ou enregistrer, puis remettre les valeurs).
 
+### 5.1bis Créer un utilisateur puis se connecter avec (bug corrigé)
+
+> Vérifie qu'un nouvel utilisateur peut se connecter **immédiatement** après sa création (régression corrigée).
+
+1. Toucher **« + »** (ajouter un utilisateur).
+2. Remplir : **Nom** (ex. `Nouveau Test`), **Email** (ex. `nouveau.test@smartfleet.fr`), **Mot de passe** (ex. `test123`), rôle **Chauffeur**.
+3. Le bouton **« Actif »** doit être **activé par défaut** (défaut corrigé).
+4. ✅ **Résultat attendu :** « Utilisateur créé », l'utilisateur apparaît dans la liste.
+5. **Se déconnecter** puis se connecter avec `nouveau.test@smartfleet.fr` / `test123`.
+6. ✅ **Résultat attendu :** la connexion **réussit** (c'était un bug : les nouveaux utilisateurs ne pouvaient pas se connecter car créés inactifs).
+
 ### 5.2 Gestion des véhicules
 
 1. Toucher **« Véhicules »**.
@@ -183,6 +211,9 @@ Cochez chaque point validé :
 - [ ] Documents : statuts Valide / Expire bientôt / Expiré
 - [ ] Admin : gestion des utilisateurs, véhicules, affectations, audit
 - [ ] RS : indicateurs, budget, documents
+- [ ] Agent IA (vocal) : une déclaration vocale complète se termine par un succès
+- [ ] Agent IA hors ligne : la déclaration vocale est sauvegardée puis envoyée à la reconnexion
+- [ ] Création d'un utilisateur par l'Admin puis connexion avec ce nouvel utilisateur (actif par défaut)
 - [ ] Aucun plantage (l'application ne se ferme pas toute seule) lors des manipulations
 
 ---
@@ -191,7 +222,7 @@ Cochez chaque point validé :
 
 > Ces étapes nécessitent des outils (Flutter, etc.) : elles sont détaillées dans le **`docs/GUIDE_TECHNIQUE.md`**.
 
-- **22 tests fonctionnels** passent (`flutter test`)
+- **65 tests fonctionnels** passent (`flutter test`)
 - `flutter analyze` : **0 erreur**
 - Fabrication du fichier d'installation : `flutter build apk --release` → copier `app-release.apk` en le renommant **`SmartFleet.apk`** dans le dossier `dist` de la livraison
 

@@ -162,7 +162,7 @@ Le guide client (`GUIDE_CLIENT_SIMPLE.md`) fait installer un fichier **`SmartFle
 
 > **État vérifié (livraison) :** les serveurs 1 et 2 ont été démarrés et testés avec succès (voir §8.8).
 > **Serveur 3 (Ollama) :** présent dans le code (`lib/services/ollama_service.dart`) mais **non relié** à l'application : l'Agent IA fonctionne entièrement avec le serveur 1. Ollama est une option pour l'avenir, sa section de démarrage est fournie ci-dessous.
-> **Sans les serveurs 1 et 2**, l'application fonctionne entièrement en local ; seule la fonction « Agent IA » affichera un message de connexion impossible.
+> **Sans les serveurs 1 et 2**, l'application fonctionne entièrement en local ; seule la fonction « Agent IA » se dégrade automatiquement : elle bascule sur la **reconnaissance vocale native** du téléphone et la **synthèse vocale intégrée** (voir §8.9). Les déclarations restent enregistrées dans le téléphone.
 
 ### 8.1 Ordre de démarrage recommandé
 
@@ -184,7 +184,7 @@ Le guide client (`GUIDE_CLIENT_SIMPLE.md`) fait installer un fichier **`SmartFle
    ```
 3. ✅ Résultat attendu (après ~30 secondes) : le log se termine par
    `Tomcat started on port 8082 (http)` → le serveur tourne.
-4. **Vérification rapide** : ouvrir un navigateur sur `http://127.0.0.1:8082/api/stt/status` → la page affiche `{"available":false}` (normal : la STT réelle est assurée par le composant 2).
+4. **Vérification rapide** : ouvrir un navigateur sur `http://127.0.0.1:8082/api/stt/status` → la page affiche `{"available":false}` (normal : la STT réelle est assurée par le composant 2). Pour vérifier que l'**agent conversationnel** répond, utiliser le test `curl` de la §8.6.
 5. **Arrêter** : toucher `Ctrl + C` dans le terminal.
 
 ### 8.3 Composant 2 — Serveur vocal TTS/STT (port 5000)
@@ -237,7 +237,7 @@ Le guide client (`GUIDE_CLIENT_SIMPLE.md`) fait installer un fichier **`SmartFle
 L'application se connecte à `127.0.0.1:8082` et `127.0.0.1:5000`. Sur un téléphone **branché en USB** (débogage USB activé, section 6), il faut rediriger ces ports vers l'ordinateur :
 
 1. Téléphone branché + « Autoriser le débogage USB » accepté.
-2. Double-cliquer sur **`restore_tunnels.bat`** (à la racine de la livraison). La fenêtre affiche :
+2. Double-cliquer sur **`scripts\restore_tunnels.bat`** (dossier `scripts` de la livraison). La fenêtre affiche :
    ```
    Restoring adb reverse tunnels...
    Tunnels restored:
@@ -249,13 +249,16 @@ L'application se connecte à `127.0.0.1:8082` et `127.0.0.1:5000`. Sur un télé
 
 > **Émulateur Android :** pas besoin de tunnels, `127.0.0.1` de l'émulateur correspond à celui de l'ordinateur.
 
+> **Déploiement sur un serveur distant (production) :** le câble USB et les tunnels ne servent qu'à la **démonstration locale** (le « serveur » est l'ordinateur). En production, l'application se connecte par **Internet** au serveur distant : il suffit de remplacer l'adresse `127.0.0.1` par l'**IP publique ou le nom de domaine** du serveur dans `smartfleet_mobile/lib/config/api_config.dart` (constante `host`), puis de recompiler l'APK. Le téléphone rejoint alors le serveur via WiFi / 4G / 5G, **sans câble**.
+
 ### 8.6 Vérifier que TOUT est connecté
 
-1. **Test du serveur Agent IA (chat)** — dans un terminal, taper la commande `curl` ci-dessous puis Entrée :
-   ```bash
-   curl -X POST http://127.0.0.1:8082/api/voice-ai/chat -H "Content-Type: application/json" -d "{\"messages\":[{\"role\":\"user\",\"content\":\"Plaque AA-123-BC, le moteur fume\"}],\"extract\":{}}"
+1. **Test du serveur Agent IA (chat)** — dans un terminal **PowerShell**, taper la commande ci-dessous puis Entrée :
+   ```powershell
+   curl.exe -X POST http://127.0.0.1:8082/api/voice-ai/chat -H "Content-Type: application/json" -d "{\"messages\":[{\"role\":\"user\",\"content\":\"Plaque AA-123-BC, le moteur fume\"}],\"extract\":{}}"
    ```
    ✅ Résultat attendu : une réponse JSON dont `extract` contient `"immatriculation": "AA123BC"` et `"typePanne": "MECANIQUE"`.
+   > Ce test fonctionne **sans Internet et sans clé OpenAI** : le backend répond en mode déterministe.
 2. Dans l'application, ouvrir la fonction **Agent IA (vocal)**.
 3. ✅ La voix est synthétisée (TTS) et la reconnaissance vocale (STT) répond.
 4. Tester une phrase : *« Plaque AA-123-BC »* → l'agent répond et reconnaît la plaque.
@@ -264,9 +267,11 @@ L'application se connecte à `127.0.0.1:8082` et `127.0.0.1:5000`. Sur un télé
 
 | Variable | Défaut | Rôle |
 |---|---|---|
-| `OPENAI_API_KEY` | *(vide)* | Sans clé : l'Agent IA répond en mode pré-programmé. |
+| `OPENAI_API_KEY` | *(vide)* | Sans clé : l'Agent IA répond en **mode déterministe** (100 % hors ligne). Avec une clé : il utilise OpenAI quand disponible. |
 | `OPENAI_MODEL` | `gpt-4` | Modèle utilisé si une clé est fournie. |
 | `JWT_ENABLED` | `false` | **Mettre `true` en production** (sécurité) + définir `JWT_SECRET`. |
+
+> **Mode déterministe :** sans `OPENAI_API_KEY`, le backend utilise son **moteur de dialogue intégré** (`fallbackResponse`) : détection d'intention en darija/français/arabe, extraction des champs (plaque, type de panne, lieu, kilométrage…), et question de suivi. **Aucun appel réseau, aucune dépendance à Internet.**
 
 ### 8.8 Résultats des tests de la livraison (serveurs 1 et 2 — vérifiés)
 
@@ -279,6 +284,28 @@ L'application se connecte à `127.0.0.1:8082` et `127.0.0.1:5000`. Sur un télé
 | Vocal — statut | `GET /api/stt/status` | `{"available":true,"service":"google_web_speech"}` ✅ |
 
 > Ces tests ont été réalisés le jour de la livraison sur un ordinateur Windows (Java 21, Python 3.10).
+>
+> **Complément vérifié (mode hors ligne) :** le `POST /api/voice-ai/chat` répond correctement **sans Internet ni clé OpenAI** (extraction `BATTERIE`/`ELECTRIQUE` sur « la batterie de la plaque 247 a est morte ») — l'agent conversationnel est 100 % offline.
+
+### 8.9 Mode ONLINE vs OFFLINE de l'Agent IA vocal
+
+L'assistant vocal gère **trois situations** automatiquement, sans action de l'utilisateur :
+
+| Situation | Écoute (STT) | Agent IA | Voix (TTS) | Déclaration |
+|---|---|---|---|---|
+| **En ligne** (Internet) | Serveur vocal (5000) — Google | Backend (8082) | Serveur vocal (5000) — voix Jamal | Enregistrée localement + file de sync |
+| **Téléphone branché au PC, sans Internet** (USB + tunnels) | **STT natif du téléphone** (fallback) | Backend (8082) — mode déterministe, **sans OpenAI** | **Synthèse locale du téléphone** (`flutter_tts`, fallback) | Enregistrée localement + file de sync |
+| **Téléphone seul, sans rien** | STT natif du téléphone | ✗ *message de connexion* | Synthèse locale (fallback) | Enregistrée localement + file de sync |
+
+**Fonctionnement technique du fallback :**
+
+1. À l'ouverture de l'écran vocal, l'app **teste la joignabilité du backend** (`GET /api/voice-ai/start` → réponse 405 = serveur actif). Branché au PC avec les tunnels actifs, ce test réussit **même sans Internet** : le backend local est joint via le câble USB.
+2. **STT** : l'app essaie d'abord le serveur vocal (5000). En cas d'échec, elle bascule sur la **reconnaissance vocale native Android** (`speech_to_text`).
+3. **TTS** : l'app essaie d'abord le serveur vocal (5000, voix `ar-MA-JamalNeural`). En cas d'échec, elle bascule sur la **synthèse vocale intégrée du téléphone** (`flutter_tts`).
+4. **Agent IA** : le backend Spring répond **toujours** en mode déterministe (`fallbackResponse`) même sans clé OpenAI ni Internet — l'extraction (plaque, type de panne) et les questions de suivi fonctionnent sans aucun service en ligne.
+5. **Déclaration** : le flux vocal passe par `DeclarationService` → base SQLite **locale** → opération ajoutée à la file de synchronisation (`sync_queue`). Elle est donc sauvegardée **immédiatement** et envoyée au serveur central plus tard, à la reconnexion.
+
+> **Dépendance mobile :** le STT natif (`speech_to_text`) et la synthèse locale (`flutter_tts`) nécessitent les composants Android correspondants : un **moteur de reconnaissance vocale** (souvent Google) et un **moteur texte-voix** (souvent Google TTS) — présents par défaut sur la plupart des téléphones.
 
 ---
 
@@ -291,4 +318,5 @@ L'application se connecte à `127.0.0.1:8082` et `127.0.0.1:5000`. Sur un télé
 - [ ] (Optionnel) Composant 1 — Serveur Agent IA : `mvn spring-boot:run` → log `Tomcat started on port 8082`
 - [ ] (Optionnel) Composant 2 — Serveur vocal : `python tts_server.py` → message `TTS+STT server starting on port 5000`
 - [ ] (Optionnel) Serveur 3 — Ollama : `ollama pull llama3.2` → modèle présent (port 11434)
-- [ ] (Optionnel) Téléphone physique : `restore_tunnels.bat` → tunnels `tcp:8082` et `tcp:5000` actifs
+- [ ] (Optionnel) Téléphone physique : `scripts\restore_tunnels.bat` → tunnels `tcp:8082` et `tcp:5000` actifs
+- [ ] (Optionnel) Agent IA hors ligne : `POST /api/voice-ai/chat` répond sans Internet (extraction de plaque OK)

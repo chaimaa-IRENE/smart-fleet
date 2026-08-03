@@ -17,7 +17,6 @@ L'application est un **fichier `.apk`** (version 1.0.0).
 
 - **Nom du fichier attendu dans la livraison : `SmartFleet.apk`** (environ 115 Mo).
 - Il se trouve dans le dossier **`dist`** à la racine de votre dossier de livraison.
-- **Le fichier peut s'appeler `app-debug.apk`** : c'est le **même** fichier, vous pouvez l'utiliser tel quel.
 - **Si aucun fichier `.apk` n'est présent : c'est un oubli du fournisseur, demandez-le-lui.** C'est le **seul** fichier dont vous avez besoin.
 - ⚠️ **Important :** dans votre dossier de livraison, il y a d'autres dossiers (ex. `docs`, `backend`, `fetched`). **Ignorez-les totalement : seul `SmartFleet.apk` vous sert.**
 
@@ -96,7 +95,9 @@ Choisissez une méthode (**USB** et **WhatsApp** fonctionnent toujours) :
 3. Remplissez les 3 étapes (Localisation → Véhicule → Détails) puis touchez **Créer**.
 4. ✅ **Résultat attendu :** la déclaration apparaît avec le statut **« En attente »** dans le menu « Déclarations ».
 
-> **Vous avez terminé.** L'application fonctionne entièrement **sans Internet** : vos données sont enregistrées dans le téléphone.
+> **Vous avez terminé.** L'application fonctionne entièrement **sans Internet** pour les fonctions de gestion (déclarations, check-up, documents…) : vos données sont enregistrées dans le téléphone.
+>
+> **À propos de l'Agent IA (vocal) :** sa version complète (voix + intelligence) nécessite le serveur fourni. Même **hors ligne**, le service vocal se dégrade automatiquement : il utilise la **voix et la reconnaissance intégrées du téléphone** (voir le guide technique pour le détail).
 
 ---
 
@@ -111,7 +112,7 @@ Choisissez une méthode (**USB** et **WhatsApp** fonctionnent toujours) :
 | **Maintenance** | Tickets de maintenance et interventions |
 | **Budget** | Suivi du budget de maintenance |
 | **Alertes & blocages** | Alerter sur un véhicule et le bloquer/débloquer |
-| **Agent IA (vocal)** | Déclarer un incident à la voix — *fonctionne si votre fournisseur a activé le service vocal* |
+| **Agent IA (vocal)** | Déclarer un incident à la voix — *le service vocal fonctionne si votre fournisseur l'a activé* |
 
 ---
 
@@ -163,3 +164,5 @@ Validation → « Traité » → Clôture → « Clôturée »
 | 05 | Accueil Prestataire | `05-accueil-prestataire.png` |
 | 06 | Accueil Admin | `06-accueil-admin.png` |
 | 07 | Accueil RS | `07-accueil-rs.png` |
+
+> ⚠️ Si le dossier `docs/screenshots/` est vide dans votre livraison, les captures n'ont pas été jointes. **Contactez votre fournisseur pour les obtenir.** L'application fonctionne de toute façon sans elles.

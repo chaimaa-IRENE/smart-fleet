@@ -81,7 +81,7 @@ class _UsersCrudState extends State<UsersCrud> {
     final matriculeCtrl = TextEditingController(text: user?['matricule'] ?? '');
     final branchCtrl = TextEditingController(text: user?['branchCode'] ?? '');
     String roleSelec = user?['role'] ?? 'CHAUFFEUR';
-    bool actif = user?['actif'] == 1 || user?['actif'] == true;
+    bool actif = user == null || user?['actif'] == 1 || user?['actif'] == true;
 
     showDialog(
       context: context,

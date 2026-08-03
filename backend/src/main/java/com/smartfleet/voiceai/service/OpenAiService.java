@@ -159,7 +159,7 @@ public class OpenAiService {
 
     // ── PREMIUM VOICE RESPONSES ───────────────────────────────────
     private static final List<String> GREETINGS = List.of(
-        "سلام عليكم! أنا المساعد الصوتي ديال SmartFleet. كيف داير؟ واش كاين شي مشكل؟",
+        "السلام عليكم! أنا المساعد الصوتي ديال SmartFleet. كيف داير؟ واش كاين شي مشكل؟",
         "وعليكم السلام! أنا هنا باش نعاونك. كي داير؟",
         "أهلا بيك فSmartFleet! أنا المساعد الصوتي ديالك. حكيني بالدارجة شنو وقع."
     );

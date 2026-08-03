@@ -10,6 +10,7 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:path_provider/path_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:record/record.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import '../../config/theme.dart';
 import '../../config/api_config.dart';
 import '../../services/voice_agent_backend_service.dart';
@@ -74,11 +75,13 @@ class _VoiceAgentState extends State<VoiceAgent> {
 
   _State _state = _State.start;
   bool _isOnline = true;
+  bool _backendReachable = false;
   bool _muted = false;
   bool _loading = false;
   bool _listening = false;
   bool _speaking = false;
   bool _sttAvailable = false;
+  final FlutterTts _localTts = FlutterTts();
 
   String? _sessionId;
   String _questionDarija = '';
@@ -499,6 +502,10 @@ class _VoiceAgentState extends State<VoiceAgent> {
       final connectivity = await Connectivity().checkConnectivity();
       _isOnline = connectivity != ConnectivityResult.none;
     } catch (_) {}
+    // Le backend local est joignable via adb reverse meme sans Internet :
+    // on tente un ping court pour savoir si l'agent IA peut repondre.
+    _backendReachable = await _pingBackend();
+    if (_backendReachable) _isOnline = true;
     try {
       _sttAvailable = await _speech.initialize(
         onError: (e) => debugPrint('STT: $e'),
@@ -508,6 +515,17 @@ class _VoiceAgentState extends State<VoiceAgent> {
       _sttAvailable = false;
     }
     if (mounted) setState(() {});
+  }
+
+  Future<bool> _pingBackend() async {
+    try {
+      final resp = await http
+          .get(Uri.parse('${ApiConfig.baseUrl}/voice-ai/start'))
+          .timeout(const Duration(seconds: 2));
+      return resp.statusCode != 0;
+    } catch (_) {
+      return false;
+    }
   }
 
   void _scrollDown() {
@@ -535,6 +553,14 @@ class _VoiceAgentState extends State<VoiceAgent> {
   }
 
   Future<void> _speakAsync(String text) async {
+    if (!await _playServerTts(text, retry: true)) {
+      await _playLocalTts(text);
+    }
+    _ttsRetryCount = 0;
+    if (mounted) setState(() => _speaking = false);
+  }
+
+  Future<bool> _playServerTts(String text, {bool retry = true}) async {
     try {
       final uri = Uri.parse('${ApiConfig.ttsUrl}/api/tts/speak').replace(queryParameters: {
         'text': text, 'voice': 'ar-MA-JamalNeural', 'rate': '-5%',
@@ -547,29 +573,31 @@ class _VoiceAgentState extends State<VoiceAgent> {
         await _audioPlayer.play(DeviceFileSource(f.path));
         await _audioPlayer.onPlayerComplete.first;
         f.delete();
+        return true;
       }
     } catch (_) {
       _ttsRetryCount++;
-      if (_ttsRetryCount <= 1) {
+      if (retry && _ttsRetryCount <= 1) {
         await Future.delayed(const Duration(seconds: 1));
-        try {
-          final uri = Uri.parse('${ApiConfig.ttsUrl}/api/tts/speak').replace(queryParameters: {
-            'text': text, 'voice': 'ar-MA-JamalNeural', 'rate': '-5%',
-          });
-          final resp = await http.get(uri).timeout(const Duration(seconds: 5));
-          if (resp.statusCode == 200) {
-            final dir = await getTemporaryDirectory();
-            final f = File('${dir.path}/tts_${DateTime.now().millisecondsSinceEpoch}.mp3');
-            await f.writeAsBytes(resp.bodyBytes);
-            await _audioPlayer.play(DeviceFileSource(f.path));
-            await _audioPlayer.onPlayerComplete.first;
-            f.delete();
-          }
-        } catch (_) {}
+        return _playServerTts(text, retry: false);
       }
     }
-    _ttsRetryCount = 0;
-    if (mounted) setState(() => _speaking = false);
+    return false;
+  }
+
+  Future<void> _playLocalTts(String text) async {
+    try {
+      final langs = await _localTts.getLanguages;
+      final ar = langs?.where((l) => l.startsWith('ar')).toList() ?? [];
+      if (ar.isNotEmpty) {
+        await _localTts.setLanguage(ar.first);
+      } else {
+        await _localTts.setLanguage('en-US');
+      }
+      await _localTts.setSpeechRate(0.45);
+      await _localTts.awaitSpeakCompletion(true);
+      await _localTts.speak(text);
+    } catch (_) {}
   }
 
   void _stopTts() {
@@ -1064,14 +1092,51 @@ class _VoiceAgentState extends State<VoiceAgent> {
         // Try backend Whisper first
         bool transcribed = await _uploadAndTranscribe(path);
         if (!transcribed) {
-          _addMsg(false, text: 'خدمة التعرف على الصوت غير متوفرة. استعمل الكتابة من فضلك');
-          if (!_muted) _speak('خدمة التعرف غير متوفرة. استعمل الكتابة');
+          // Fallback local : reconnaissance sur l'appareil
+          final local = await _transcribeLocally();
+          if (local != null && local.isNotEmpty) {
+            _sendResponse(local);
+          } else {
+            _addMsg(false, text: 'خدمة التعرف على الصوت غير متوفرة. استعمل الكتابة من فضلك');
+            if (!_muted) _speak('خدمة التعرف غير متوفرة. استعمل الكتابة');
+          }
         }
       }
       // Cleanup
       try { File(path).deleteSync(); } catch (_) {}
     }
     if (mounted) setState(() => _listening = false);
+  }
+
+  /// Reconnaissance vocale locale via speech_to_text (fonctionne hors ligne).
+  Future<String?> _transcribeLocally() async {
+    if (!_sttAvailable) return null;
+    if (!await _speech.initialize()) return null;
+
+    final completer = Completer<String?>();
+    String? result;
+    try {
+      await _speech.listen(
+        localeId: 'ar',
+        listenOptions: stt.SpeechListenOptions(
+          listenFor: const Duration(seconds: 10),
+          pauseFor: const Duration(seconds: 3),
+          cancelOnError: true,
+          partialResults: true,
+        ),
+        onResult: (r) {
+          if (r.recognizedWords.isNotEmpty) result = r.recognizedWords;
+          if (r.finalResult) completer.complete(result);
+        },
+      );
+      final value = await completer.future
+          .timeout(const Duration(seconds: 15), onTimeout: () => result);
+      return value;
+    } catch (_) {
+      return result;
+    } finally {
+      try { await _speech.stop(); } catch (_) {}
+    }
   }
 
   /// Uploads audio to backend Whisper. Returns true if transcription was successful.

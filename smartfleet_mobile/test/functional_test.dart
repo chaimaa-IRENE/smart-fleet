@@ -148,6 +148,48 @@ void main() {
     print('  ✓ CRUD Utilisateurs: create, read, update, delete');
   });
 
+  test('2b. Bug regress - Nouvel utilisateur actif par defaut puis login', () async {
+    final userDao = UserDao();
+
+    // Reproduit exactement le data map construit par _showUserDialog de
+    // UsersCrud pour un NOUVEL utilisateur : actif doit etre 1 par defaut.
+    final newUser = <String, dynamic>{
+      'nom': 'Nouveau Conducteur',
+      'prenom': 'Ali',
+      'email': 'ali.nouveau@smartfleet.fr',
+      'password': 'nouveau123',
+      'telephone': '0661122334',
+      'role': 'CHAUFFEUR',
+      'actif': true ? 1 : 0, // regle a 1 pour tout nouvel utilisateur
+      'matricule': 'NC-001',
+      'branchCode': 'BR-01',
+    };
+    final id = await userDao.insert(newUser);
+    expect(id, greaterThan(0));
+
+    // L'utilisateur doit pouvoir se connecter immediatement.
+    final login = await userDao.login('ali.nouveau@smartfleet.fr', 'nouveau123');
+    expect(login, isNotNull,
+        reason: 'Utilisateur nouvellement cree doit pouvoir se connecter');
+    expect(login!['role'], 'CHAUFFEUR');
+
+    // Un user inactif ne doit PAS pouvoir se connecter (regression inverse).
+    final inactiveId = await userDao.insert({
+      'nom': 'Inactif',
+      'email': 'inactif@smartfleet.fr',
+      'password': 'test123',
+      'role': 'CHAUFFEUR',
+      'actif': 0,
+    });
+    expect(inactiveId, greaterThan(0));
+    final inactiveLogin =
+        await userDao.login('inactif@smartfleet.fr', 'test123');
+    expect(inactiveLogin, isNull,
+        reason: 'Un utilisateur inactif ne peut pas se connecter');
+
+    print('  ✓ Bug regress: nouvel utilisateur actif + login OK, inactif refuse');
+  });
+
   test('4. CRUD Vehicules', () async {
     final vehicleService = VehicleService();
 

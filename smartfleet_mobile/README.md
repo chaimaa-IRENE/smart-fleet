@@ -15,7 +15,7 @@
 ## À retenir
 
 - **L'essentiel de l'application fonctionne sans ordinateur et sans serveur** : les données sont enregistrées dans le téléphone (base de données locale, créée automatiquement au premier lancement).
-- **APK installable (livraison)** : `SmartFleet.apk` — dans le dossier **`dist`** à la racine du dossier de livraison. C'est le fichier à installer sur le téléphone (voir le guide client).
+- **APK installable (livraison)** : `SmartFleet.apk` — fourni dans le dossier **`dist`** du dossier de livraison (hors GitHub, le fichier dépasse la limite de 100 Mo). C'est le fichier à installer sur le téléphone (voir le guide client).
 - **Comptes de démonstration :**
 
 | Email | Mot de passe | Rôle |

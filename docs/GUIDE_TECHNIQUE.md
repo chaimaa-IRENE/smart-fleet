@@ -143,7 +143,7 @@ Le guide client (`GUIDE_CLIENT_SIMPLE.md`) fait installer un fichier **`SmartFle
    ```
 4. Vérifier que `SmartFleet.apk` se trouve bien dans le dossier `dist`, à la racine de la livraison.
 
-> **Si la livraison utilise Git :** le fichier `.gitignore` ignore les `*.apk`. Pour forcer l'envoi du fichier : `git add -f SmartFleet.apk`.
+> **Si la livraison utilise Git :** le fichier `.gitignore` ignore les `*.apk`. Le `SmartFleet.apk` (≈ 120 Mo) **dépasse la limite de 100 Mo de GitHub** et ne peut donc pas être poussé sur ce dépôt : livrez-le en **dehors de Git** (dossier `dist/` du dossier de livraison, transfert direct, clé USB, etc.).
 >
 > **Signature :** l'APK produit est signé avec la clé *debug* (configuration par défaut du projet). Pour une publication officielle, remplacez la ligne `signingConfig = signingConfigs.getByName("debug")` du fichier `android/app/build.gradle.kts` par un vrai certificat de production.
 

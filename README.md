@@ -10,9 +10,10 @@
 | `backend/` | Serveur **Agent IA** (Spring Boot, port 8082) + serveur **vocal TTS/STT** (Python, port 5000) |
 | `powerbi_rs/` | Rapport **Power BI** pour le rôle Responsable Support |
 | `docs/` | Guides : client simple, technique, captures d'écran |
-| `scripts/` | Tunnels adb pour la démonstration locale (`restore_tunnels.bat`) |
-| `dist/` | APK de livraison (`SmartFleet.apk`) |
+| `scripts/` | Tunnels adb pour la démonstration locale (`restore_tunnels.bat`, `watch_tunnels.ps1`) |
 | `TEST_CLIENT.md` | Guide de test pas à pas de toutes les fonctions |
+
+> **📦 APK de livraison** : le fichier `SmartFleet.apk` (≈120 Mo) dépasse la limite de GitHub (100 Mo), il est donc livré **en dehors de ce dépôt** (dossier `dist/` de votre dossier de livraison). Voir [`docs/GUIDE_CLIENT_SIMPLE.md`](docs/GUIDE_CLIENT_SIMPLE.md).
 
 ## Documentation
 
@@ -24,7 +25,7 @@
 
 ## Démarrage rapide (démonstration)
 
-1. **Installer l'app** : `dist/SmartFleet.apk` sur un téléphone Android 7+ (voir le guide client).
+1. **Installer l'app** : `SmartFleet.apk` (fourni dans le dossier `dist/` de la livraison, hors GitHub) sur un téléphone Android 7+ (voir le guide client).
 2. **Lancer les serveurs** (agent IA 8082 + vocal 5000) :
    ```bash
    cd backend
